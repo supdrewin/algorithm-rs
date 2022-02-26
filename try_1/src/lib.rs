@@ -37,8 +37,8 @@ impl Solution {
     ///
     /// Judge if a sentence is palindrome.
     ///
-    /// Firstly, we filter all alphabetic in the sentence and convert
-    /// them as lowercase into a deque.
+    /// Firstly, we filter all alphabet and number in the sentence
+    /// and convert them as lowercase into a deque.
     /// Then we match the front and back value. If they aren't equal,
     /// the sentence is not palindrome. Otherwise, pop the previous
     /// values and match the next front and back.
@@ -46,7 +46,7 @@ impl Solution {
         let mut sentence: VecDeque<u8> = sentence
             .as_bytes()
             .iter()
-            .filter(|c| c.is_ascii_alphabetic())
+            .filter(|c| c.is_ascii_alphanumeric())
             .map(|c| return c.to_ascii_lowercase())
             .collect();
         while sentence.len() > 1 {

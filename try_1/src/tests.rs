@@ -19,6 +19,7 @@ fn josephs_ring() {
 fn is_palindrome() {
     assert_eq!(Solution::is_palindrome("madam, i am a man."), false);
     assert_eq!(Solution::is_palindrome("madam, I'm adam."), true);
+    assert_eq!(Solution::is_palindrome("0P"), false); // leetcode
 }
 
 #[test]
