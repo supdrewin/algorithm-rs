@@ -3,7 +3,10 @@ use crate::Solution;
 #[test]
 fn pentagram_game() {
     let result = Solution::pentagram_game();
-    println!("{:?}", result);
+    assert_eq!(result.len(), 12);
+    for vec in &result {
+        println!("{:?}", vec);
+    }
 }
 
 #[test]
