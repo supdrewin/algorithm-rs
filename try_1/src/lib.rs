@@ -3,42 +3,36 @@ use std::collections::VecDeque;
 pub struct Solution;
 
 impl Solution {
-    /// Question 1
+    /// Question 1 - Josephs Ring Problem.
     ///
-    /// Return
-    ///
-    /// vector with input number of people,
-    /// true if bad people, otherwise good people.
-    ///
-    /// Params
-    ///
-    /// `input`, 2n, should always the power of 2
-    /// m, pop the m'th people
-    pub fn josephs_ring(input: i32, m: i32) -> Vec<bool> {
-        let mut result = Vec::with_capacity(input as usize);
-        for _ in 0..input {
-            result.push(false);
-        }
-        let mut i = -1;
-        for _ in 0..(input >> 1) {
+    /// There are **2n** people, then pop a people per **m** people. It
+    /// should left all good people after pop **n** people. Firstly, We
+    /// guess all people as good people, then setting a pointer `idx`,
+    /// which point to first people after apply an add. Then pop a bad
+    /// people per **m** people. We only minus **m** if a good people,
+    /// this mean the popped bad people are skipped. Finally, return a
+    /// slice contains bad people with false and good people with true.
+    pub fn josephs_ring(n: i32, m: i32) -> Vec<bool> {
+        let len = (n as usize) << 1;
+        let mut result = vec![true; len];
+        let mut idx = -1;
+        for _ in 0..n {
             let mut m = m;
             while m > 0 {
-                i += 1;
-                if result[(i % input) as usize] != true {
+                idx += 1;
+                if result[idx as usize % len] {
                     m -= 1;
                 }
             }
-            result[(i % input) as usize] = true;
+            result[idx as usize % len] = false;
         }
         result
     }
 
-    /// Question 2
+    /// Question 2 - Judge if a sentence is palindrome.
     ///
-    /// Judge if a sentence is palindrome.
-    ///
-    /// Firstly, we filter all alphabet and number in the sentence
-    /// and convert them as lowercase into a deque.
+    /// Firstly, we filter all **alphabet** and **number** in the
+    /// sentence and convert them as **lowercase** into a `deque`.
     /// Then we match the front and back value. If they aren't equal,
     /// the sentence is not palindrome. Otherwise, pop the previous
     /// values and match the next front and back.
@@ -47,7 +41,7 @@ impl Solution {
             .as_bytes()
             .iter()
             .filter(|c| c.is_ascii_alphanumeric())
-            .map(|c| return c.to_ascii_lowercase())
+            .map(|c| c.to_ascii_lowercase())
             .collect();
         while sentence.len() > 1 {
             if let Some(first) = sentence.front() {
@@ -65,53 +59,45 @@ impl Solution {
         true
     }
 
-    /// Question 3
+    /// Question 3 - Tower of Hanoi.
     ///
-    /// recursive
-    ///
-    /// Big one should below small one.
+    /// The big one should always below small one and we can only move one. To
+    /// solve this problem, the last one should be place to the `dist`,  so we
+    /// firstly move all above to the `tmp`. After the last one in place, we
+    /// move `tmp` to `dist`. And ..., the above one also should be placed to
+    /// `dist`, then we do same thing with last one to the above one. Finally,
+    /// we solve this problem by recursion.
     pub fn tower_of_hanoi(src: &mut Vec<i32>, tmp: &mut Vec<i32>, dist: &mut Vec<i32>) {
-        Solution::_move(src, tmp, dist, src.len());
-    }
-
-    /// _move
-    ///
-    /// Privite method for tower_of_hanoi
-    fn _move(src: &mut Vec<i32>, tmp: &mut Vec<i32>, dist: &mut Vec<i32>, counter: usize) {
-        if counter > 0 {
-            // Doubt: Why should we do (src -> tmp -> dist)?
-            Solution::_move(src, dist, tmp, counter - 1);
-            dist.push(src.pop().unwrap());
-            Solution::_move(tmp, src, dist, counter - 1);
-        }
-    }
-
-    /// Question 4
-    ///
-    /// recursive
-    pub fn full_permutation(input: &Vec<i32>) -> Vec<Vec<i32>> {
-        let mut result = Vec::new();
-        unsafe {
-            Solution::_full_permutation(input.clone(), 0, &mut result);
-        }
-        result
-    }
-
-    /// _full_permutation
-    ///
-    /// Private method for recursion, noted that this method is extremely unsafe because
-    /// `input` will move here and be push into result later. The initialize depth should
-    /// always be 0.
-    unsafe fn _full_permutation(input: Vec<i32>, depth: usize, result: &mut Vec<Vec<i32>>) {
-        if depth == input.len() {
-            result.push(input);
-        } else {
-            for i in depth..input.len() {
-                let mut input = input.clone();
-                input.swap(i, depth);
-                Solution::_full_permutation(input, depth + 1, result);
+        fn mov(src: &mut Vec<i32>, tmp: &mut Vec<i32>, dist: &mut Vec<i32>, cnt: usize) {
+            if cnt > 0 {
+                mov(src, dist, tmp, cnt - 1);
+                dist.push(src.pop().unwrap());
+                mov(tmp, src, dist, cnt - 1);
             }
         }
+        mov(src, tmp, dist, src.len());
+    }
+
+    /// Question 4 - Full Permutation
+    ///
+    /// We use a recursion to solve this problem, this method is also
+    /// known as `DFS` _(Depth-First Search)_. Why clone `vec` before
+    /// swap? Good problem, because I'm too lazy to swap it again.
+    pub fn full_permutation(vec: &Vec<i32>) -> Vec<Vec<i32>> {
+        fn search(vec: Vec<i32>, depth: usize, result: &mut Vec<Vec<i32>>) {
+            if depth == vec.len() {
+                result.push(vec);
+            } else {
+                for i in depth..vec.len() {
+                    let mut vec = vec.clone();
+                    vec.swap(i, depth);
+                    search(vec, depth + 1, result);
+                }
+            }
+        }
+        let mut result = Vec::new();
+        search(vec.clone(), 0, &mut result);
+        result
     }
 }
 
