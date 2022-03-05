@@ -35,4 +35,8 @@ fn red_and_black() {
 fn sliding_puzzle() {}
 
 #[test]
-fn solve_n_queens() {}
+fn solve_n_queens() {
+    let result = Solution::solve_n_queens(8);
+    assert_eq!(result.len(), 92);
+    println!("{:#?}", result);
+}

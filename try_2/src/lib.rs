@@ -104,17 +104,80 @@ impl Solution {
         todo!()
     }
 
-    /// Question 4
+    /// Question 4 - Eight Gueens Problem
     ///
-    /// Write an algorithm to print all ways of arranging n
-    /// queens on an n x n chess board so that none of them
-    /// share the same row, column, or diagonal. In this case,
-    /// "diagonal" means all diagonals, not just the two that
-    /// bisect the board.
+    /// Write an algorithm to print all ways of arranging n queens
+    /// on an n x n chess board so that none of them share the same
+    /// row, column, or diagonal. In this case, "diagonal" means all
+    /// diagonals, not just the two that bisect the board.
     ///
     /// https://leetcode-cn.com/problems/eight-queens-lcci
-    pub fn solve_n_queens() {
-        todo!()
+    ///
+    /// This problem can be simply solved by `DFS`. Firstly, we build
+    /// a "map" with each line to it's column, then we fork the "map"
+    /// each different choose (column). The only thing we should pay
+    /// attention is cut the fork invalid (line 162 ~ 169). When the
+    /// recursion on the top (map forked is full), we convert the map
+    /// to result's element (149 ~ 158).
+    ///
+    /// # Issues
+    ///
+    /// Add this if FromIterator didn't preluded by your compiler.
+    ///
+    /// ``` rust
+    /// use core::iter::FromIterator;
+    /// ```
+    ///
+    /// If you are using a `stable` Rust and have some issues with the
+    /// `abs_diff`. Simply add this following function into the body,
+    /// then modify the line 164.
+    ///
+    /// ``` rust
+    /// use std::{cmp::Ordering, ops::Sub};
+    ///
+    /// fn abs_diff<T: Default + Ord + Sub<Output = T>>(a: T, b: T) -> T {
+    ///     match a.cmp(&b) {
+    ///         Ordering::Equal => T::default(),
+    ///         Ordering::Greater => a - b,
+    ///         Ordering::Less => b - a,
+    ///     }
+    /// }
+    /// ```
+    pub fn solve_n_queens(n: usize) -> Vec<Vec<String>> {
+        fn search(map: Vec<usize>, x: usize, result: &mut Vec<Vec<String>>) {
+            if x == map.len() {
+                result.push(
+                    vec![vec!['.'; map.len()]; map.len()]
+                        .iter_mut()
+                        .enumerate()
+                        .map(|(x, vec)| {
+                            vec[map[x]] = 'Q';
+                            String::from_iter(vec.iter())
+                        })
+                        .collect(),
+                );
+            } else {
+                for y in 0..map.len() {
+                    if {
+                        let mut check = true;
+                        for i in 0..x {
+                            if map[i] == y || map[i].abs_diff(y) == i.abs_diff(x) {
+                                check = false;
+                                break;
+                            }
+                        }
+                        check
+                    } {
+                        let mut map = map.clone();
+                        map[x] = y;
+                        search(map, x + 1, result);
+                    }
+                }
+            }
+        }
+        let mut result = Vec::new();
+        search(vec![0usize; n], 0, &mut result);
+        result
     }
 }
 
