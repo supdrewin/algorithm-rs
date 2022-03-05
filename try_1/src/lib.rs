@@ -83,14 +83,14 @@ impl Solution {
     /// We use a recursion to solve this problem, this method is also
     /// known as `DFS` _(Depth-First Search)_. Why clone `vec` before
     /// swap? Good problem, because I'm too lazy to swap it again.
-    pub fn full_permutation(vec: &Vec<i32>) -> Vec<Vec<i32>> {
-        fn search(vec: Vec<i32>, depth: usize, result: &mut Vec<Vec<i32>>) {
+    pub fn full_permutation<T: Clone>(vec: &Vec<T>) -> Vec<Vec<T>> {
+        fn search<T: Clone>(vec: Vec<T>, depth: usize, result: &mut Vec<Vec<T>>) {
             if depth == vec.len() {
                 result.push(vec);
             } else {
-                for i in depth..vec.len() {
+                for idx in depth..vec.len() {
                     let mut vec = vec.clone();
-                    vec.swap(i, depth);
+                    vec.swap(idx, depth);
                     search(vec, depth + 1, result);
                 }
             }

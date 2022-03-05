@@ -44,7 +44,8 @@ impl Solution {
         };
         let mut result = Vec::new();
         let mut set = HashSet::new();
-        for vec in &mut Solution::full_permutation(&vec![1, 2, 3, 4, 5, 6, 8, 9, 10, 12]) {
+        let vec = vec![1, 2, 3, 4, 5, 6, 8, 9, 10, 12];
+        for vec in &mut Solution::full_permutation(&vec) {
             if vec[0] + vec[7] + vec[6] == vec[5] + vec[9] + vec[1] {
                 if vec[3] + vec[5] + vec[9] == vec[8] + vec[7] + vec[4] {
                     if vec[1] + vec[8] + vec[7] == vec[6] + vec[5] + vec[2] {
@@ -94,7 +95,12 @@ impl Solution {
 
     /// Question 3 - Sliding Puzzle Problem
     ///
-    /// TODO
+    /// This method simply using a `BFS` which prefered to search the
+    /// shortest path. We firstly check the bound of the board, and
+    /// then  search the null slot to be swapped. Secondly, we create
+    /// a deque for `BFS`. For moving, the valid directs are filtered.
+    /// Because of the rules, I swap the raw pointer instead of double
+    /// mutable borrow.
     pub fn sliding_puzzle<T: PartialEq + Clone>(
         src: &Vec<Vec<T>>,
         dist: &Vec<Vec<T>>,
@@ -167,9 +173,9 @@ impl Solution {
     /// This problem can be simply solved by `DFS`. Firstly, we build
     /// a "map" with each line to it's column, then we fork the "map"
     /// each different choose (column). The only thing we should pay
-    /// attention is cut the fork invalid (line 162 ~ 169). When the
+    /// attention is cut the fork invalid (line 218 ~ 226). When the
     /// recursion on the top (map forked is full), we convert the map
-    /// to result's element (149 ~ 158).
+    /// to result's element (206 ~ 214).
     ///
     /// # Issues
     ///
@@ -181,7 +187,7 @@ impl Solution {
     ///
     /// If you are using a `stable` Rust and have some issues with the
     /// `abs_diff`. Simply add this following function into the body,
-    /// then modify the line 164.
+    /// then modify the line 221.
     ///
     /// ``` rust
     /// use std::{cmp::Ordering, ops::Sub};
