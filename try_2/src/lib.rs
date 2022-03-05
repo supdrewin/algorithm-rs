@@ -161,7 +161,7 @@ impl Solution {
         todo!()
     }
 
-    /// Question 4 - Eight Gueens Problem
+    /// Question 4 - Eight Gueens Problem (0 ms 2.3 MB)
     ///
     /// Write an algorithm to print all ways of arranging n queens
     /// on an n x n chess board so that none of them share the same
@@ -175,7 +175,7 @@ impl Solution {
     /// each different choose (column). The only thing we should pay
     /// attention is cut the fork invalid (line 218 ~ 226). When the
     /// recursion on the top (map forked is full), we convert the map
-    /// to result's element (206 ~ 214).
+    /// to result's element (line 206 ~ 214).
     ///
     /// # Issues
     ///
