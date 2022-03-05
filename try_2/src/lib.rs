@@ -104,21 +104,21 @@ impl Solution {
             (0, src.len() - 1),
             (0, src.get(0).expect("Get bound failed!").len() - 1),
         );
+        let mut pos = Default::default();
+        for x in bound.0 .0..bound.0 .1 {
+            for y in bound.1 .0..bound.1 .1 {
+                if src[x][y] == nul {
+                    pos = (x, y);
+                    break;
+                }
+            }
+        }
         let mut deque = VecDeque::new();
-        deque.push_back((src.clone(), 0));
+        deque.push_back((src.clone(), pos, 0));
         while !deque.is_empty() {
-            let (src, step) = deque.pop_front().unwrap();
+            let (src, pos, step) = deque.pop_front().unwrap();
             if *dist == src {
                 return Some(step);
-            }
-            let mut pos = (0, 0);
-            for x in bound.0 .0..bound.0 .1 {
-                for y in bound.1 .0..bound.1 .1 {
-                    if src[x][y] == nul {
-                        pos = (x, y);
-                        break;
-                    }
-                }
             }
             let mut direct = Vec::new();
             if pos.0 > bound.0 .0 {
@@ -141,7 +141,7 @@ impl Solution {
                         &mut src[pos.0][pos.1] as *mut T,
                     );
                 }
-                deque.push_back((src, step + 1));
+                deque.push_back((src, next, step + 1));
             }
         }
         None
