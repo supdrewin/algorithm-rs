@@ -1,4 +1,7 @@
-use std::{collections::HashSet, mem};
+use std::{
+    collections::{HashSet, VecDeque},
+    mem, ptr,
+};
 
 pub struct Solution;
 
@@ -89,11 +92,59 @@ impl Solution {
         result
     }
 
-    /// Question 3
+    /// Question 3 - Sliding Puzzle Problem
     ///
-    ///
-    pub fn sliding_puzzle() {
-        todo!()
+    /// TODO
+    pub fn sliding_puzzle<T: PartialEq + Clone>(
+        src: &Vec<Vec<T>>,
+        dist: &Vec<Vec<T>>,
+        nul: T,
+    ) -> Option<usize> {
+        let bound = (
+            (0, src.len() - 1),
+            (0, src.get(0).expect("Get bound failed!").len() - 1),
+        );
+        let mut deque = VecDeque::new();
+        deque.push_back((src.clone(), 0));
+        while !deque.is_empty() {
+            let (src, step) = deque.pop_front().unwrap();
+            if *dist == src {
+                return Some(step);
+            }
+            let mut pos = (0, 0);
+            for x in bound.0 .0..bound.0 .1 {
+                for y in bound.1 .0..bound.1 .1 {
+                    if src[x][y] == nul {
+                        pos = (x, y);
+                        break;
+                    }
+                }
+            }
+            let mut direct = Vec::new();
+            if pos.0 > bound.0 .0 {
+                direct.push((pos.0 - 1, pos.1));
+            }
+            if pos.0 < bound.0 .1 {
+                direct.push((pos.0 + 1, pos.1));
+            }
+            if pos.1 > bound.1 .0 {
+                direct.push((pos.0, pos.1 - 1));
+            }
+            if pos.1 < bound.1 .1 {
+                direct.push((pos.0, pos.1 + 1));
+            }
+            for next in direct {
+                let mut src = src.clone();
+                unsafe {
+                    ptr::swap(
+                        &mut src[next.0][next.1] as *mut T,
+                        &mut src[pos.0][pos.1] as *mut T,
+                    );
+                }
+                deque.push_back((src, step + 1));
+            }
+        }
+        None
     }
 
     /// Get the inverse number of a board.

@@ -32,7 +32,11 @@ fn red_and_black() {
 }
 
 #[test]
-fn sliding_puzzle() {}
+fn sliding_puzzle() {
+    let src = vec![vec![1, 2, 3], vec![0, 8, 4], vec![7, 6, 5]];
+    let dist = vec![vec![1, 0, 3], vec![8, 2, 4], vec![7, 6, 5]];
+    assert_eq!(Solution::sliding_puzzle(&src, &dist, 0).unwrap(), 2);
+}
 
 #[test]
 fn solve_n_queens() {
