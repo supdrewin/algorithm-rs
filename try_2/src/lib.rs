@@ -51,10 +51,11 @@ impl Solution {
         let remain = vec![1, 2, 3, 4, 5, 6, 8, 9, 10, 12];
         for (vec4, remain) in Solution::permutation(&remain, 4) {
             let sum = vec4[0] + vec4[1] + vec4[2];
-            let tmp = vec4[3] - vec4[1];
+            let tmp1 = vec4[3] - vec4[1];
             for (vec3, remain) in Solution::permutation(&remain, 3) {
-                if sum == vec3[0] + vec3[1] + vec3[2] {
-                    let tmp = tmp + vec3[0] + vec3[1];
+                let tmp2 = vec3[0] + vec3[1];
+                if sum == tmp2 + vec3[2] {
+                    let tmp = tmp1 + tmp2;
                     for (vec2, vec1) in Solution::permutation(&remain, 2) {
                         if tmp == vec2[0] + vec2[1] {
                             let tmp = vec4[2] + vec3[0] - vec2[0];
@@ -190,9 +191,9 @@ impl Solution {
     /// This problem can be simply solved by `DFS`. Firstly, we build
     /// a "map" with each line to it's column, then we fork the "map"
     /// each different choose (column). The only thing we should pay
-    /// attention is cut the fork invalid (line 235 ~ 244). When the
+    /// attention is cut the fork invalid (line 236 ~ 245). When the
     /// recursion on the top (map forked is full), we convert the map
-    /// to result's element (line 223 ~ 232).
+    /// to result's element (line 224 ~ 233).
     ///
     /// # Issues
     ///
@@ -204,7 +205,7 @@ impl Solution {
     ///
     /// If you are using a `stable` Rust and have some issues with the
     /// `abs_diff`. Simply add this following function into the body,
-    /// then modify the line 238.
+    /// then modify the line 239.
     ///
     /// ``` rust
     /// use std::{cmp::Ordering, ops::Sub};
