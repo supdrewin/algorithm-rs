@@ -1,5 +1,6 @@
 use std::{
     collections::{HashSet, VecDeque},
+    hash::Hash,
     mem, ptr,
 };
 
@@ -113,13 +114,14 @@ impl Solution {
 
     /// Question 3 - Sliding Puzzle Problem
     ///
-    /// This method simply using a `BFS` which prefered to search the
-    /// shortest path. We firstly check the bound of the board, and
-    /// then  search the null slot to be swapped. Secondly, we create
-    /// a deque for `BFS`. For moving, the valid directs are filtered.
-    /// Because of the rules, I swap the raw pointer instead of double
-    /// mutable borrow.
-    pub fn sliding_puzzle<T: PartialEq + Clone>(
+    /// This method simply using a `BFS` which prefered to search
+    /// the shortest path. We firstly check the bound of the board,
+    /// and then search the null slot to be swapped. Secondly, we
+    /// create a deque for `BFS`. We only need to setup a hash set
+    /// for the repeated steps. For moving, the valid directs are
+    /// filtered the bound of board. Because of the rules, I swap
+    /// the raw pointer instead of double mutable borrow.
+    pub fn sliding_puzzle<T: Clone + Eq + Hash>(
         src: &Vec<Vec<T>>,
         dist: &Vec<Vec<T>>,
         nul: T,
@@ -128,20 +130,25 @@ impl Solution {
             (0, src.len() - 1),
             (0, src.get(0).expect("Get bound failed!").len() - 1),
         );
-        let mut pos = Default::default();
-        for x in bound.0 .0..bound.0 .1 {
-            for y in bound.1 .0..bound.1 .1 {
-                if src[x][y] == nul {
-                    pos = (x, y);
-                    break;
+        let pos = {
+            let mut pos = None;
+            for x in bound.0 .0..=bound.0 .1 {
+                for y in bound.1 .0..=bound.1 .1 {
+                    if src[x][y] == nul {
+                        pos = Some((x, y));
+                        break;
+                    }
                 }
             }
-        }
+            pos.expect("Get position failed!")
+        };
+        let mut set = HashSet::new();
+        set.insert(src.clone());
         let mut deque = VecDeque::new();
         deque.push_back((src.clone(), pos, 0));
         while !deque.is_empty() {
             let (src, pos, step) = deque.pop_front().unwrap();
-            if *dist == src {
+            if &src == dist {
                 return Some(step);
             }
             let mut direct = Vec::new();
@@ -165,7 +172,9 @@ impl Solution {
                         &mut src[pos.0][pos.1] as *mut T,
                     );
                 }
-                deque.push_back((src, next, step + 1));
+                if set.insert(src.clone()) {
+                    deque.push_back((src, next, step + 1));
+                }
             }
         }
         None
@@ -191,9 +200,9 @@ impl Solution {
     /// This problem can be simply solved by `DFS`. Firstly, we build
     /// a "map" with each line to it's column, then we fork the "map"
     /// each different choose (column). The only thing we should pay
-    /// attention is cut the fork invalid (line 236 ~ 245). When the
+    /// attention is cut the fork invalid (line 245 ~ 254). When the
     /// recursion on the top (map forked is full), we convert the map
-    /// to result's element (line 224 ~ 233).
+    /// to result's element (line 233 ~ 242).
     ///
     /// # Issues
     ///
@@ -205,7 +214,7 @@ impl Solution {
     ///
     /// If you are using a `stable` Rust and have some issues with the
     /// `abs_diff`. Simply add this following function into the body,
-    /// then modify the line 239.
+    /// then modify the line 248.
     ///
     /// ``` rust
     /// use std::{cmp::Ordering, ops::Sub};
@@ -236,7 +245,7 @@ impl Solution {
                     if {
                         let mut check = true;
                         for i in 0..x {
-                            if map[i] == y || map[i].abs_diff(y) == i.abs_diff(x) {
+                            if map[i] == y || i.abs_diff(x) == map[i].abs_diff(y) {
                                 check = false;
                                 break;
                             }

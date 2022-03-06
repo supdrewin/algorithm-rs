@@ -10,7 +10,7 @@ fn pentagram_game() {
 }
 
 #[test]
-fn red_and_black() {
+fn red_and_black_1() {
     let room = vec![
         vec!['.', '.', '.', '.', '#'],
         vec!['.', '.', '.', '.', '.'],
@@ -20,22 +20,84 @@ fn red_and_black() {
     for vec in &room {
         println!("{:?}", vec);
     }
-    let mut pos = (0, 0);
-    for (x, vec) in room.iter().enumerate() {
-        for (y, &c) in vec.iter().enumerate() {
-            if c == '@' {
-                pos = (x, y);
-            }
-        }
-    }
-    assert_eq!(Solution::red_and_black(&room, pos), 15);
+    assert_eq!(Solution::red_and_black(&room, (2, 1)), 15);
 }
 
 #[test]
-fn sliding_puzzle() {
-    let src = vec![vec![1, 2, 3], vec![0, 8, 4], vec![7, 6, 5]];
-    let dist = vec![vec![1, 0, 3], vec![8, 2, 4], vec![7, 6, 5]];
-    assert_eq!(Solution::sliding_puzzle(&src, &dist, 0).unwrap(), 2);
+fn red_and_black_2() {
+    let room = vec![
+        vec!['.', '.', '.', '.', '#'],
+        vec!['.', '.', '.', '.', '#'],
+        vec!['.', '@', '#', '.', '.'],
+        vec!['.', '.', '.', '.', '#'],
+    ];
+    for vec in &room {
+        println!("{:?}", vec);
+    }
+    assert_eq!(Solution::red_and_black(&room, (2, 1)), 16);
+}
+
+#[test]
+#[rustfmt::skip]
+fn sliding_puzzle_1() {
+    assert_eq!(
+        Solution::sliding_puzzle(
+            &vec![
+                vec![1, 2, 3],
+                vec![0, 8, 4],
+                vec![7, 6, 5],
+            ],
+            &vec![
+                vec![1, 0, 3],
+                vec![8, 2, 4],
+                vec![7, 6, 5],
+            ],
+            0,
+        ),
+        Some(2),
+    );
+}
+
+#[test]
+#[rustfmt::skip]
+fn sliding_puzzle_2() {
+    assert_eq!(
+        Solution::sliding_puzzle(
+            &vec![
+                vec![3, 8, 5],
+                vec![2, 0, 6],
+                vec![1, 4, 7],
+            ],
+            &vec![
+                vec![1, 2, 3],
+                vec![4, 5, 6],
+                vec![7, 8, 0],
+            ],
+            0,
+        ),
+        Some(16),
+    );
+}
+
+#[test]
+#[rustfmt::skip]
+fn sliding_puzzle_3() {
+    assert_eq!(
+        Solution::sliding_puzzle(
+            &vec![
+                vec![1, 2, 3],
+                vec![4, 5, 6],
+                vec![8, 7, 0],
+            ],
+            &vec![
+                vec![1, 2, 3],
+                vec![4, 5, 6],
+                vec![7, 8, 0],
+            ],
+            0,
+        ),
+        None,
+    );
 }
 
 #[test]
