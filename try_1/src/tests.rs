@@ -16,39 +16,44 @@ fn josephs_ring() {
 }
 
 #[test]
-fn is_palindrome() {
+fn is_palindrome_1() {
     assert_eq!(Solution::is_palindrome("madam, i am a man."), false);
+}
+
+#[test]
+fn is_palindrome_2() {
     assert_eq!(Solution::is_palindrome("madam, I'm adam."), true);
+}
+
+#[test]
+fn is_palindrome_3() {
     assert_eq!(Solution::is_palindrome("0P"), false); // leetcode
 }
 
 #[test]
 fn tower_of_hanoi() {
-    let src = &mut vec![];
-    let tmp = &mut vec![];
-    let dist = &mut vec![];
-    for i in (0..10).rev() {
-        src.push(i);
-    }
-    let result = src.clone();
+    let result = Vec::from_iter((0..10).rev());
     println!("{:?}", result);
-    Solution::tower_of_hanoi(src, tmp, dist);
-    assert_eq!(*src, vec![]);
-    assert_eq!(*tmp, vec![]);
-    assert_eq!(*dist, result);
+    let mut src = result.clone();
+    let mut tmp = Vec::new();
+    let mut dist = Vec::new();
+    Solution::tower_of_hanoi(&mut src, &mut tmp, &mut dist);
+    assert_eq!(src, vec![]);
+    assert_eq!(tmp, vec![]);
+    assert_eq!(dist, result);
 }
 
 #[test]
 fn permutation() {
-    let vec = vec![1, 2, 3];
-    // Next line let `cnt = vec.len()` to do a full permutation.
-    let result = Solution::permutation(&vec, vec.len());
-    println!("{:?}", result);
-    assert_eq!(result.len(), 6);
-    assert!(result.contains(&vec![1, 2, 3]));
-    assert!(result.contains(&vec![1, 3, 2]));
-    assert!(result.contains(&vec![2, 1, 3]));
-    assert!(result.contains(&vec![2, 3, 1]));
-    assert!(result.contains(&vec![3, 1, 2]));
-    assert!(result.contains(&vec![3, 2, 1]));
+    assert_eq!(
+        Solution::permutation(&vec![1, 2, 3], 3),
+        vec![
+            (vec![1, 2, 3], vec![]),
+            (vec![1, 3, 2], vec![]),
+            (vec![2, 1, 3], vec![]),
+            (vec![2, 3, 1], vec![]),
+            (vec![3, 2, 1], vec![]),
+            (vec![3, 1, 2], vec![])
+        ]
+    );
 }

@@ -8,53 +8,70 @@ pub struct Solution;
 impl Solution {
     /// Question 1 - Pentagram Game
     ///
-    /// Enter 1..=12 into pentagram, except 7 and 11. the spins
-    /// and mirrors are trusted as same. The pentagram and each
-    /// index are as follow.
-    ///      0
-    /// 4  7  8   1
-    ///   6    9
-    ///     5
-    /// 3       2
+    /// Enter 1..=12 into pentagram, except 7 and 11. the spins and mirrors
+    /// are trusted as same. The pentagram and each index are as follow.
+    ///      0                        4[0]
+    /// 8  1  7   6         2[1]   4[1] 2[0]     3[2]
+    ///   2    5                4[2]      3[1]
+    ///     4                       3[0]
+    /// 3       9           4[3]             1[0]
     ///
     /// The number filled into should be:
-    /// [0] + [7] + [6] == [5] + [9] + [1]
-    /// [3] + [5] + [9] == [8] + [7] + [4]
-    /// [1] + [8] + [7] == [6] + [5] + [2]
-    /// [4] + [6] + [5] == [9] + [8] + [0]
+    /// 0 (4[0]) + 1 (4[1]) + 2 (4[2]) == 4 (3[0]) + 5 (3[1]) + 6 (3[2])
+    /// 3 (4[3]) + 4 (3[0]) + 5 (3[1]) == 7 (2[0]) + 1 (4[1]) + 8 (2[1])
+    /// 6 (3[2]) + 7 (2[0]) + 1 (4[1]) == 2 (4[2]) + 4 (3[0]) + 9 (1[0])
+    /// 8 (2[1]) + 2 (4[2]) + 4 (3[0]) == 5 (3[1]) + 7 (2[0]) + 0 (4[0])
     ///
-    /// Note: this method using `DFS` is extremely sloooooowly
-    /// and it's bound to time out.
+    /// Note: This method using `DFS` is extremely sloooooowly, but we can
+    /// filter out some branches for hacking. As a result, 3.55s -> 0.07s.
     pub fn pentagram_game() -> Vec<Vec<i32>> {
         use try_1::Solution;
         let spin = |vec: &Vec<i32>| {
             let mut vec = vec.clone();
-            for i in [0, 1, 2, 3, 5, 6, 7, 8] {
-                vec.swap(i, i + 1);
-            }
+            vec.swap(0, 6);
+            vec.swap(6, 9);
+            vec.swap(9, 3);
+            vec.swap(3, 8);
+            vec.swap(4, 2);
+            vec.swap(2, 1);
+            vec.swap(1, 7);
+            vec.swap(7, 5);
             vec
         };
         let mirror = |vec: &Vec<i32>| {
             let mut vec = vec.clone();
-            vec.swap(1, 4);
-            vec.swap(2, 3);
-            vec.swap(6, 9);
-            vec.swap(7, 8);
+            vec.swap(1, 7);
+            vec.swap(2, 5);
+            vec.swap(3, 9);
+            vec.swap(8, 6);
             vec
         };
         let mut result = Vec::new();
         let mut set = HashSet::new();
-        let vec = vec![1, 2, 3, 4, 5, 6, 8, 9, 10, 12];
-        for vec in &mut Solution::permutation(&vec, vec.len()) {
-            if vec[0] + vec[7] + vec[6] == vec[5] + vec[9] + vec[1] {
-                if vec[3] + vec[5] + vec[9] == vec[8] + vec[7] + vec[4] {
-                    if vec[1] + vec[8] + vec[7] == vec[6] + vec[5] + vec[2] {
-                        if vec[4] + vec[6] + vec[5] == vec[9] + vec[8] + vec[0] {
-                            if !set.contains(vec) {
-                                result.push(vec.clone());
-                                for _ in 0..5 {
-                                    set.insert(mem::replace(vec, spin(&vec)));
-                                    set.insert(mirror(&vec));
+        let remain = vec![1, 2, 3, 4, 5, 6, 8, 9, 10, 12];
+        for (vec4, remain) in Solution::permutation(&remain, 4) {
+            let sum = vec4[0] + vec4[1] + vec4[2];
+            let tmp = vec4[3] - vec4[1];
+            for (vec3, remain) in Solution::permutation(&remain, 3) {
+                if sum == vec3[0] + vec3[1] + vec3[2] {
+                    let tmp = tmp + vec3[0] + vec3[1];
+                    for (vec2, vec1) in Solution::permutation(&remain, 2) {
+                        if tmp == vec2[0] + vec2[1] {
+                            let tmp = vec4[2] + vec3[0] - vec2[0];
+                            if tmp == vec4[0] + vec3[1] - vec2[1]
+                                && tmp == vec4[1] + vec3[2] - vec1[0]
+                            {
+                                let mut vec = vec![
+                                    vec4[0], vec4[1], vec4[2], vec4[3], vec3[0], vec3[1], vec3[2],
+                                    vec2[0], vec2[1], vec1[0],
+                                ];
+                                if !set.contains(&vec) {
+                                    result.push(vec.clone());
+                                    for _ in 0..5 {
+                                        let spin = spin(&vec);
+                                        set.insert(mem::replace(&mut vec, spin));
+                                        set.insert(mirror(&vec));
+                                    }
                                 }
                             }
                         }
@@ -173,9 +190,9 @@ impl Solution {
     /// This problem can be simply solved by `DFS`. Firstly, we build
     /// a "map" with each line to it's column, then we fork the "map"
     /// each different choose (column). The only thing we should pay
-    /// attention is cut the fork invalid (line 218 ~ 226). When the
+    /// attention is cut the fork invalid (line 235 ~ 244). When the
     /// recursion on the top (map forked is full), we convert the map
-    /// to result's element (line 206 ~ 214).
+    /// to result's element (line 223 ~ 232).
     ///
     /// # Issues
     ///
@@ -187,7 +204,7 @@ impl Solution {
     ///
     /// If you are using a `stable` Rust and have some issues with the
     /// `abs_diff`. Simply add this following function into the body,
-    /// then modify the line 221.
+    /// then modify the line 238.
     ///
     /// ``` rust
     /// use std::{cmp::Ordering, ops::Sub};

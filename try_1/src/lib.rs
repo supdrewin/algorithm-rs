@@ -80,26 +80,24 @@ impl Solution {
 
     /// Question 4 - Full Permutation
     ///
-    /// We use a recursion to solve this problem, this method is also
-    /// known as `DFS` _(Depth-First Search)_. This method **isn't**
-    /// the direct implementation of full permutation, but implement
-    /// the  permutation `A(n, m)`. For the `full permutation` (a.k.a.
-    /// `A(n, n)`)), just let **`cnt = vec.len()`**. Q: Why clone the
-    /// `vec` before swap? A: Good Question, because I'm too lazy to
-    /// swap it again.
-    pub fn permutation<T: Clone>(vec: &Vec<T>, cnt: usize) -> Vec<Vec<T>> {
-        #[rustfmt::skip]
+    /// We use a recursion to solve this problem, this method is also known as
+    /// `DFS` _(usually Depth-First Search)_. This method **IS NOT** the direct
+    /// implementation of full permutation, but implement the permutation `A(n,
+    /// m)`. For the **Full Permutation** (a.k.a. `A(n, n)`)), just let `cnt =
+    /// vec.len()`. The tuple vector has two part: The first part is the result
+    /// of permutation, and the second part is the remaining elements of `vec`.
+    /// We don't need to use `HashMap` (std) here because the implementation of
+    /// `HashMap` (std) is sloooooowly.
+    pub fn permutation<T: Clone>(vec: &Vec<T>, cnt: usize) -> Vec<(Vec<T>, Vec<T>)> {
         fn search<T: Clone>(
             mut vec: Vec<T>,
             cnt: usize,
             depth: usize,
-            result: &mut Vec<Vec<T>>
+            result: &mut Vec<(Vec<T>, Vec<T>)>,
         ) {
             if depth == cnt {
-                while vec.len() != cnt {
-                    vec.pop();
-                }
-                result.push(vec);
+                let tail = vec.split_off(cnt);
+                result.push((vec, tail));
             } else {
                 for idx in depth..vec.len() {
                     let mut vec = vec.clone();
