@@ -45,7 +45,7 @@ impl Solution {
         let mut result = Vec::new();
         let mut set = HashSet::new();
         let vec = vec![1, 2, 3, 4, 5, 6, 8, 9, 10, 12];
-        for vec in &mut Solution::full_permutation(&vec) {
+        for vec in &mut Solution::permutation(&vec, vec.len()) {
             if vec[0] + vec[7] + vec[6] == vec[5] + vec[9] + vec[1] {
                 if vec[3] + vec[5] + vec[9] == vec[8] + vec[7] + vec[4] {
                     if vec[1] + vec[8] + vec[7] == vec[6] + vec[5] + vec[2] {

@@ -39,9 +39,10 @@ fn tower_of_hanoi() {
 }
 
 #[test]
-fn full_permutation() {
+fn permutation() {
     let vec = vec![1, 2, 3];
-    let result = Solution::full_permutation(&vec);
+    // Next line let `cnt = vec.len()` to do a full permutation.
+    let result = Solution::permutation(&vec, vec.len());
     println!("{:?}", result);
     assert_eq!(result.len(), 6);
     assert!(result.contains(&vec![1, 2, 3]));

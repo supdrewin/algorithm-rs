@@ -81,22 +81,36 @@ impl Solution {
     /// Question 4 - Full Permutation
     ///
     /// We use a recursion to solve this problem, this method is also
-    /// known as `DFS` _(Depth-First Search)_. Why clone `vec` before
-    /// swap? Good problem, because I'm too lazy to swap it again.
-    pub fn full_permutation<T: Clone>(vec: &Vec<T>) -> Vec<Vec<T>> {
-        fn search<T: Clone>(vec: Vec<T>, depth: usize, result: &mut Vec<Vec<T>>) {
-            if depth == vec.len() {
+    /// known as `DFS` _(Depth-First Search)_. This method **isn't**
+    /// the direct implementation of full permutation, but implement
+    /// the  permutation `A(n, m)`. For the `full permutation` (a.k.a.
+    /// `A(n, n)`)), just let **`cnt = vec.len()`**. Q: Why clone the
+    /// `vec` before swap? A: Good Question, because I'm too lazy to
+    /// swap it again.
+    pub fn permutation<T: Clone>(vec: &Vec<T>, cnt: usize) -> Vec<Vec<T>> {
+        #[rustfmt::skip]
+        fn search<T: Clone>(
+            mut vec: Vec<T>,
+            cnt: usize,
+            depth: usize,
+            result: &mut Vec<Vec<T>>
+        ) {
+            if depth == cnt {
+                while vec.len() != cnt {
+                    vec.pop();
+                }
                 result.push(vec);
             } else {
                 for idx in depth..vec.len() {
                     let mut vec = vec.clone();
                     vec.swap(idx, depth);
-                    search(vec, depth + 1, result);
+                    search(vec, cnt, depth + 1, result);
                 }
             }
         }
+        assert!(cnt <= vec.len());
         let mut result = Vec::new();
-        search(vec.clone(), 0, &mut result);
+        search(vec.clone(), cnt, 0, &mut result);
         result
     }
 }
