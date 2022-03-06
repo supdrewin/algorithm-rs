@@ -3,5 +3,5 @@
 To test it:
 
 ``` shell
-$ cargo test
+$ cargo test -r
 ```
