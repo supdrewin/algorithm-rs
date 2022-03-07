@@ -44,16 +44,16 @@ fn tower_of_hanoi() {
 }
 
 #[test]
-fn permutation() {
+fn full_permutation() {
     assert_eq!(
-        Solution::permutation(&vec![1, 2, 3], 3),
+        Solution::full_permutation(&vec![1, 2, 3]),
         vec![
-            (vec![1, 2, 3], vec![]),
-            (vec![1, 3, 2], vec![]),
-            (vec![2, 1, 3], vec![]),
-            (vec![2, 3, 1], vec![]),
-            (vec![3, 2, 1], vec![]),
-            (vec![3, 1, 2], vec![])
+            vec![1, 2, 3],
+            vec![1, 3, 2],
+            vec![2, 1, 3],
+            vec![2, 3, 1],
+            vec![3, 2, 1],
+            vec![3, 1, 2],
         ]
     );
 }

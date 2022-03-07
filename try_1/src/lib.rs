@@ -111,6 +111,17 @@ impl Solution {
         search(vec.clone(), cnt, 0, &mut result);
         result
     }
+
+    /// Question 4 - Full Permutation
+    ///
+    /// This is a wrapper of previous permutation algorithm for
+    /// directly get the full permutation from a vector.
+    pub fn full_permutation<T: Clone>(vec: &Vec<T>) -> Vec<Vec<T>> {
+        Self::permutation(vec, vec.len())
+            .into_iter()
+            .map(|v| v.0)
+            .collect()
+    }
 }
 
 #[cfg(test)]
