@@ -166,7 +166,7 @@ fn sliding_puzzle_6() {
 }
 
 #[test]
-#[ignore]
+#[ignore = "It's bound to timeout."]
 #[rustfmt::skip]
 fn sliding_puzzle_7() {
     assert_eq!(
