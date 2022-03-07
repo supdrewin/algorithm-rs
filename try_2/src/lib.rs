@@ -160,9 +160,9 @@ impl Solution {
             }
             direct
         };
-        let mut vec = Vec::new();
-        let mut map = HashMap::new();
-        let (pos1, pos2) = {
+        let (pos1, pos2, cnt) = {
+            let mut vec = Vec::new();
+            let mut map = HashMap::new();
             let mut pos1 = None;
             let mut pos2 = None;
             let mut idx = 0;
@@ -181,23 +181,29 @@ impl Solution {
                     }
                 }
             }
+            let mut vec = vec
+                .into_iter()
+                .map(|v| map.get(v).expect("Board is invalid!"))
+                .collect::<Vec<&usize>>();
+            let mut cnt = 0usize;
+            for end in (1..vec.len()).rev() {
+                let bak = cnt;
+                for idx in 0..end {
+                    if vec[idx] > vec[idx + 1] {
+                        vec.swap(idx, idx + 1);
+                        cnt += 1;
+                    }
+                }
+                if bak == cnt {
+                    break;
+                }
+            }
             (
                 pos1.expect("Get position failed!"),
                 pos2.expect("Get position failed!"),
+                cnt,
             )
         };
-        let vec: Vec<&usize> = vec
-            .iter()
-            .map(|v| map.get(v).expect("Board is invalid!"))
-            .collect();
-        let mut cnt = 0;
-        for front in 0..(vec.len() - 1) {
-            for back in (front + 1)..vec.len() {
-                if vec[front] > vec[back] {
-                    cnt += 1;
-                }
-            }
-        }
         if cnt & 1 == 0 {
             let mut map = HashMap::new();
             let mut deque1 = VecDeque::new();

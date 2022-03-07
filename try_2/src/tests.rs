@@ -143,6 +143,53 @@ fn sliding_puzzle_5() {
 }
 
 #[test]
+#[rustfmt::skip]
+fn sliding_puzzle_6() {
+    assert_eq!(
+        Solution::sliding_puzzle(
+            &vec![
+                vec![ 1, 14,  3,  4],
+                vec![ 7,  0,  5,  8],
+                vec![ 9, 11, 10, 12],
+                vec![13,  2, 15,  6],
+            ],
+            &vec![
+                vec![ 1,  2,  3,  4],
+                vec![ 5,  6,  7,  8],
+                vec![ 9, 10, 11, 12],
+                vec![13, 14, 15,  0],
+            ],
+            0,
+        ),
+        Some(36),
+    );
+}
+
+#[test]
+#[ignore]
+#[rustfmt::skip]
+fn sliding_puzzle_7() {
+    assert_eq!(
+        Solution::sliding_puzzle(
+            &vec![
+                vec![12, 14, 11,  4],
+                vec![ 7,  0,  9,  8],
+                vec![15, 10,  3, 13],
+                vec![ 1,  2,  5,  6],
+            ],
+            &vec![
+                vec![ 1,  2,  3,  4],
+                vec![ 5,  6,  7,  8],
+                vec![ 9, 10, 11, 12],
+                vec![13, 14, 15,  0],
+            ],
+            0,
+        ),
+        Some(0),
+    );
+}
+
+#[test]
 fn solve_n_queens() {
     let result = Solution::solve_n_queens(8);
     assert_eq!(result.len(), 92);
