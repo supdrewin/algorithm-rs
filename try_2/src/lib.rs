@@ -114,18 +114,21 @@ impl Solution {
 
     /// Question 3 - Sliding Puzzle Problem
     ///
-    /// This method using a Two-way `BFS` which prefered to search the
-    /// shortest path when the `src` and `dist` are known. We firstly
-    /// check the bound of the board, and then search the null slot to
-    /// be swapped. We also get the "magic" number mainly for verifying
-    /// whether the board is valid. The detail is we have to map the src
-    /// -> dist for the math inverse number. Secondly, we create double
-    /// deque for Two-way `BFS`, one start by `src` and the other start
-    /// by `dist`. We can simply setup a `hash map` to record whether a
-    /// step is repeated and who pass by it. For moving the blocks, the
-    /// valid directs are filtered the `bound` of the board. Due to the
-    /// borrow rules, I swap the raw ptr to avoid double mutable borrow
-    /// (which actually safe sometime).
+    /// This method using a Two-way `BFS` which prefered to search
+    /// the shortest path when both the `src` and `dist` are known.
+    /// Firstly, we check the bound of the board, and then search
+    /// the `null slot` to be swapped. Then we need to calculate a
+    /// _"magical number"_ (a.k.a. `inverse number`) for verifying
+    /// whether the board is valid. The detail is that we have to
+    /// map the `src` -> `dist` for the math inverse number. If the
+    /// puzzle is valid (inverse number (`cnt`) is the power of 2),
+    /// we create double deque for Two-way `BFS`, one start by `src`
+    /// and the other start by `dist`. We can simply setup a `hash
+    /// map` to record whether a step is repeated and who passby it.
+    /// For moving the blocks, the valid directions are filtered by
+    /// the `bound` of the board. Due to the borrowed rules, I swap
+    /// the raw ptr to avoid double mutable borrow (which actually
+    /// safe sometime).
     pub fn sliding_puzzle<T: Clone + Eq + Hash>(
         src: &Vec<Vec<T>>,
         dist: &Vec<Vec<T>>,
@@ -195,7 +198,7 @@ impl Solution {
                 }
             }
         }
-        if cnt % 2 == 0 {
+        if cnt & 1 == 0 {
             let mut map = HashMap::new();
             let mut deque1 = VecDeque::new();
             let mut deque2 = VecDeque::new();
@@ -263,9 +266,9 @@ impl Solution {
     /// This problem can be simply solved by `DFS`. Firstly, we build
     /// a "map" with each line to it's column, then we fork the "map"
     /// each different choose (column). The only thing we should pay
-    /// attention is cut the fork invalid (line 308 ~ 317). When the
+    /// attention is cut the fork invalid (line 311 ~ 320). When the
     /// recursion on the top (map forked is full), we convert the map
-    /// to result's element (line 296 ~ 305).
+    /// to result's element (line 299 ~ 308).
     ///
     /// # Issues
     ///
@@ -277,7 +280,7 @@ impl Solution {
     ///
     /// If you are using a `stable` Rust and have some issues with the
     /// `abs_diff`. Simply add this following function into the body,
-    /// then modify the line 311.
+    /// then modify the line 314.
     ///
     /// ``` rust
     /// use std::{cmp::Ordering, ops::Sub};
