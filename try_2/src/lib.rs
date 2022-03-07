@@ -114,43 +114,74 @@ impl Solution {
 
     /// Question 3 - Sliding Puzzle Problem
     ///
-    /// This method simply using a `BFS` which prefered to search the shortest
-    /// path. We firstly check the bound of the board, and then search the null
-    /// slot to be swapped. We also get the "magic" number mainly for verifying
-    /// whether the board is valid (Why this number?). The detail is we have to
-    /// map the src -> dist for the math inverse number. Secondly, we create a
-    /// deque for `BFS`. For judging the repeated steps, we only need to setup
-    /// a `hash set`. For moving the **blocks**, the valid directs are filtered
-    /// the `bound` of the board. Due to the borrowed rules, I swap the raw ptr
-    /// to avoid double mutable borrow (which actually safe sometime).
+    /// This method using a Two-way `BFS` which prefered to search the
+    /// shortest path when the `src` and `dist` are known. We firstly
+    /// check the bound of the board, and then search the null slot to
+    /// be swapped. We also get the "magic" number mainly for verifying
+    /// whether the board is valid. The detail is we have to map the src
+    /// -> dist for the math inverse number. Secondly, we create double
+    /// deque for Two-way `BFS`, one start by `src` and the other start
+    /// by `dist`. We can simply setup a `hash map` to record whether a
+    /// step is repeated and who pass by it. For moving the blocks, the
+    /// valid directs are filtered the `bound` of the board. Due to the
+    /// borrow rules, I swap the raw ptr to avoid double mutable borrow
+    /// (which actually safe sometime).
     pub fn sliding_puzzle<T: Clone + Eq + Hash>(
         src: &Vec<Vec<T>>,
         dist: &Vec<Vec<T>>,
         nul: T,
     ) -> Option<usize> {
+        assert_eq!(src.len(), dist.len());
+        assert_eq!(
+            src.get(0).expect("Get bound failed!").len(),
+            dist.get(0).expect("Get bound failed!").len()
+        );
+        #[rustfmt::skip]
         let bound = (
             (0, src.len() - 1),
-            (0, src.get(0).expect("Get bound failed!").len() - 1),
+            (0, src[0].len() - 1)
         );
+        let direct = |pos: (usize, usize)| {
+            let mut direct = Vec::new();
+            if pos.0 > bound.0 .0 {
+                direct.push((pos.0 - 1, pos.1));
+            }
+            if pos.0 < bound.0 .1 {
+                direct.push((pos.0 + 1, pos.1));
+            }
+            if pos.1 > bound.1 .0 {
+                direct.push((pos.0, pos.1 - 1));
+            }
+            if pos.1 < bound.1 .1 {
+                direct.push((pos.0, pos.1 + 1));
+            }
+            direct
+        };
         let mut vec = Vec::new();
         let mut map = HashMap::new();
-        let pos = {
-            let mut pos = None;
+        let (pos1, pos2) = {
+            let mut pos1 = None;
+            let mut pos2 = None;
             let mut idx = 0;
             for x in bound.0 .0..=bound.0 .1 {
                 for y in bound.1 .0..=bound.1 .1 {
                     if src[x][y] == nul {
-                        pos = Some((x, y));
+                        pos1 = Some((x, y));
                     } else {
                         vec.push(&src[x][y]);
                     }
-                    if dist[x][y] != nul {
+                    if dist[x][y] == nul {
+                        pos2 = Some((x, y));
+                    } else {
                         map.insert(&dist[x][y], idx);
                         idx += 1;
                     }
                 }
             }
-            pos.expect("Get position failed!")
+            (
+                pos1.expect("Get position failed!"),
+                pos2.expect("Get position failed!"),
+            )
         };
         let vec: Vec<&usize> = vec
             .iter()
@@ -165,41 +196,57 @@ impl Solution {
             }
         }
         if cnt % 2 == 0 {
-            let mut set = HashSet::new();
-            set.insert(src.clone());
-            let mut deque = VecDeque::new();
-            deque.push_back((src.clone(), pos, 0));
-            while !deque.is_empty() {
-                let (src, pos, step) = deque.pop_front().unwrap();
-                if &src == dist {
-                    return Some(step);
-                }
-                let mut direct = Vec::new();
-                if pos.0 > bound.0 .0 {
-                    direct.push((pos.0 - 1, pos.1));
-                }
-                if pos.0 < bound.0 .1 {
-                    direct.push((pos.0 + 1, pos.1));
-                }
-                if pos.1 > bound.1 .0 {
-                    direct.push((pos.0, pos.1 - 1));
-                }
-                if pos.1 < bound.1 .1 {
-                    direct.push((pos.0, pos.1 + 1));
-                }
-                for next in direct {
-                    let mut src = src.clone();
+            let mut map = HashMap::new();
+            let mut deque1 = VecDeque::new();
+            let mut deque2 = VecDeque::new();
+            deque1.push_back((src.clone(), pos1, 0));
+            deque2.push_back((dist.clone(), pos2, 0));
+            let search = |vec: &Vec<Vec<T>>,
+                          deque: &mut VecDeque<(Vec<Vec<T>>, (usize, usize), usize)>,
+                          pos: (usize, usize),
+                          step: usize| {
+                for next in direct(pos) {
+                    let mut vec = vec.clone();
                     unsafe {
                         ptr::swap(
-                            &mut src[next.0][next.1] as *mut T,
-                            &mut src[pos.0][pos.1] as *mut T,
+                            &mut vec[next.0][next.1] as *mut T,
+                            &mut vec[pos.0][pos.1] as *mut T,
                         );
                     }
-                    if set.insert(src.clone()) {
-                        deque.push_back((src, next, step + 1));
-                    }
+                    deque.push_back((vec, next, step + 1));
                 }
-            }
+            };
+            while {
+                match deque1.pop_front() {
+                    Some((src, pos1, step1)) => {
+                        match map.get(&src) {
+                            Some((2, step2)) => return Some(step1 + step2),
+                            None => {
+                                map.insert(src.clone(), (1, step1));
+                                search(&src, &mut deque1, pos1, step1);
+                            }
+                            _ => (),
+                        }
+                        true
+                    }
+                    None => false,
+                }
+            } && {
+                match deque2.pop_front() {
+                    Some((dist, pos2, step2)) => {
+                        match map.get(&dist) {
+                            Some((1, step1)) => return Some(step1 + step2),
+                            None => {
+                                map.insert(dist.clone(), (2, step2));
+                                search(&dist, &mut deque2, pos2, step2);
+                            }
+                            _ => (),
+                        }
+                        true
+                    }
+                    None => false,
+                }
+            } {}
         }
         None
     }
@@ -216,9 +263,9 @@ impl Solution {
     /// This problem can be simply solved by `DFS`. Firstly, we build
     /// a "map" with each line to it's column, then we fork the "map"
     /// each different choose (column). The only thing we should pay
-    /// attention is cut the fork invalid (line 261 ~ 270). When the
+    /// attention is cut the fork invalid (line 308 ~ 317). When the
     /// recursion on the top (map forked is full), we convert the map
-    /// to result's element (line 249 ~ 258).
+    /// to result's element (line 296 ~ 305).
     ///
     /// # Issues
     ///
@@ -230,7 +277,7 @@ impl Solution {
     ///
     /// If you are using a `stable` Rust and have some issues with the
     /// `abs_diff`. Simply add this following function into the body,
-    /// then modify the line 264.
+    /// then modify the line 311.
     ///
     /// ``` rust
     /// use std::{cmp::Ordering, ops::Sub};

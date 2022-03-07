@@ -101,6 +101,27 @@ fn sliding_puzzle_3() {
 }
 
 #[test]
+#[rustfmt::skip]
+fn sliding_puzzle_4() {
+    assert_eq!(
+        Solution::sliding_puzzle(
+            &vec![
+                vec![1, 2, 3],
+                vec![7, 8, 6],
+                vec![5, 4, 0],
+            ],
+            &vec![
+                vec![1, 2, 3],
+                vec![4, 5, 6],
+                vec![7, 8, 0],
+            ],
+            0,
+        ),
+        None,
+    );
+}
+
+#[test]
 fn solve_n_queens() {
     let result = Solution::solve_n_queens(8);
     assert_eq!(result.len(), 92);
