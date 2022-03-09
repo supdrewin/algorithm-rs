@@ -11,17 +11,19 @@ impl Solution {
     ///
     /// Enter 1..=12 into pentagram, except 7 and 11. the spins and mirrors
     /// are trusted as same. The pentagram and each index are as follow.
-    ///      0                        4[0]
-    /// 8  1  7   6         2[1]   4[1] 2[0]     3[2]
-    ///   2    5                4[2]      3[1]
-    ///     4                       3[0]
-    /// 3       9           4[3]             1[0]
+    ///
+    /// _____0___________________4(0)              <br />
+    /// 8__1__7___6_____2(1)___4(1)_2(0)______3(2) <br />
+    /// __2____5_____________4(2)_____3(1)         <br />
+    /// ____4____________________3(0)              <br />
+    /// 3_______9________4(3)____________1(0)      <br />
     ///
     /// The number filled into should be:
-    /// 0 (4[0]) + 1 (4[1]) + 2 (4[2]) == 4 (3[0]) + 5 (3[1]) + 6 (3[2])
-    /// 3 (4[3]) + 4 (3[0]) + 5 (3[1]) == 7 (2[0]) + 1 (4[1]) + 8 (2[1])
-    /// 6 (3[2]) + 7 (2[0]) + 1 (4[1]) == 2 (4[2]) + 4 (3[0]) + 9 (1[0])
-    /// 8 (2[1]) + 2 (4[2]) + 4 (3[0]) == 5 (3[1]) + 7 (2[0]) + 0 (4[0])
+    ///
+    /// 0 (4(0)) + 1 (4(1)) + 2 (4(2)) == 4 (3(0)) + 5 (3(1)) + 6 (3(2)) <br />
+    /// 3 (4(3)) + 4 (3(0)) + 5 (3(1)) == 7 (2(0)) + 1 (4(1)) + 8 (2(1)) <br />
+    /// 6 (3(2)) + 7 (2(0)) + 1 (4(1)) == 2 (4(2)) + 4 (3(0)) + 9 (1(0)) <br />
+    /// 8 (2(1)) + 2 (4(2)) + 4 (3(0)) == 5 (3(1)) + 7 (2(0)) + 0 (4(0)) <br />
     ///
     /// Note: This method using `DFS` is extremely sloooooowly, but we can
     /// filter out some branches for hacking. As a result, 3.55s -> 0.07s.
@@ -267,14 +269,14 @@ impl Solution {
     /// row, column, or diagonal. In this case, "diagonal" means all
     /// diagonals, not just the two that bisect the board.
     ///
-    /// https://leetcode-cn.com/problems/eight-queens-lcci
+    /// <https://leetcode-cn.com/problems/eight-queens-lcci>
     ///
     /// This problem can be simply solved by `DFS`. Firstly, we build
     /// a "map" with each line to it's column, then we fork the "map"
     /// each different choose (column). The only thing we should pay
-    /// attention is cut the fork invalid (line 311 ~ 320). When the
+    /// attention is cut the fork invalid (line 319 ~ 328). When the
     /// recursion on the top (map forked is full), we convert the map
-    /// to result's element (line 299 ~ 308).
+    /// to result's element (line 307 ~ 316).
     ///
     /// # Issues
     ///
@@ -286,7 +288,7 @@ impl Solution {
     ///
     /// If you are using a `stable` Rust and have some issues with the
     /// `abs_diff`. Simply add this following function into the body,
-    /// then modify the line 314.
+    /// then modify the line 322.
     ///
     /// ``` rust
     /// use std::{cmp::Ordering, ops::Sub};
