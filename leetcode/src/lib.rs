@@ -24,6 +24,15 @@ impl Solution {
     ///
     /// - 1 <= nums.length <= 10^5
     /// - 0 <= nums[i] < nums.length
+    ///
+    /// Firstly, we map the diffs of each num, and calculate the score of `k = 0`. For `diff >
+    /// 0`, we map the nums to it's last `k` it could get a point. Then we traverse `k` from 1
+    /// to the end. There are many changes before caculate the next score. First step is get
+    /// current diff (which will move to the end). If it has got a score, then minus a point
+    /// previous (it won't lose a point after moving to the end), others add a point to it's
+    /// first `k` that got a point. Then we sub the score we will lose after a ratation. After
+    /// changes, `k += 1` (a rotation finished). If current score greater than max score, then
+    /// update the `result`.
     pub fn best_rotation(nums: &Vec<usize>) -> usize {
         let mut result = (0, 0);
         let diffs = nums
