@@ -6,7 +6,7 @@ pub struct Solution;
 
 impl Solution {
     #[allow(rustdoc::broken_intra_doc_links)]
-    /// 798 - Smallest Rotation with Highest Score (16 ms 3.4 MB)
+    /// 798 - Smallest Rotation with Highest Score (12 ms 3.3 MB)
     ///
     /// You are given anarray nums. You can rotate it by a non-negative integer k so that the
     /// array becomes [nums[k], nums[k + 1], ... nums[nums.length - 1], nums[0], nums[1], ...,
@@ -30,9 +30,10 @@ impl Solution {
     /// to the end. There are many changes before caculate the next score. First step is get
     /// current diff (which will move to the end). If it has got a score, then minus a point
     /// previous (it won't lose a point after moving to the end), others add a point to it's
-    /// first `k` that got a point. Then we sub the score we will lose after a ratation. After
-    /// changes, `k += 1` (a rotation finished). If current score greater than max score, then
-    /// update the `result`.
+    /// first `k` that got a point. Note that a negative diff (the diff after apply the `k` is
+    /// negative) will always get a point after a rotation. Then we minus the score will lost
+    /// after a rotation. After changes, `k += 1` (a rotation has finished). If current score
+    /// greater than max score, then update the `result`.
     pub fn best_rotation(nums: &Vec<usize>) -> usize {
         let mut result = (0, 0);
         let diffs = nums
@@ -53,24 +54,16 @@ impl Solution {
         diffs
             .iter()
             .map(|&diff| {
-                if diff.is_negative() {
-                    map[nums.len().wrapping_add_signed(diff)] += 1;
-                } else {
-                    map[diff.unsigned_abs()] -= 1;
-                }
-                if diff.wrapping_sub_unsigned(idx).is_negative()
-                    && diff
-                        .wrapping_add_unsigned(nums.len())
-                        .wrapping_sub_unsigned(idx)
-                        .is_positive()
-                {
-                    score += 1;
-                }
+                diff.is_negative()
+                    .then(|| map[nums.len().wrapping_add_signed(diff)] += 1)
+                    .is_none()
+                    .then(|| map[diff.unsigned_abs()] -= 1);
+                diff.wrapping_sub_unsigned(idx)
+                    .is_negative()
+                    .then(|| score += 1);
                 score -= map[idx];
                 idx += 1;
-                if score.gt(&result.1) {
-                    result = (idx, score);
-                }
+                score.gt(&result.1).then(|| result = (idx, score));
             })
             .count();
         result.0
