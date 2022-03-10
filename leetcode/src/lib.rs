@@ -1,8 +1,72 @@
+#![feature(mixed_integer_ops)]
+
 use std::ptr;
 
 pub struct Solution;
 
 impl Solution {
+    #[allow(rustdoc::broken_intra_doc_links)]
+    /// 798 - Smallest Rotation with Highest Score (16 ms 3.4 MB)
+    ///
+    /// You are given anarray nums. You can rotate it by a non-negative integer k so that the
+    /// array becomes [nums[k], nums[k + 1], ... nums[nums.length - 1], nums[0], nums[1], ...,
+    /// nums[k-1]]. Afterward, any entries that are less than or equal to their index are worth
+    /// one point.
+    ///
+    /// For example, if we have nums = [2, 4, 1, 3, 0], and we rotate by k = 2, it becomes [1,
+    /// 3, 0, 2, 4]. This is worth 3 points because 1 > 0 [no points], 3 > 1 [no points], 0 <=
+    /// 2 [one point], 2 <= 3 [one point], 4 <= 4 [one point].
+    ///
+    /// Return the rotation index k that corresponds to the highest score we can achieve if we
+    /// rotated nums by it. If there are multiple answers, return the smallest such index k.
+    ///
+    /// Constraints:
+    ///
+    /// - 1 <= nums.length <= 10^5
+    /// - 0 <= nums[i] < nums.length
+    pub fn best_rotation(nums: &Vec<usize>) -> usize {
+        let mut result = (0, 0);
+        let diffs = nums
+            .iter()
+            .zip(0isize..)
+            .map(|(&num, idx)| idx.wrapping_sub_unsigned(num))
+            .collect::<Vec<isize>>();
+        let mut map = vec![0isize; nums.len()];
+        diffs
+            .iter()
+            .filter(|diff| !diff.is_negative())
+            .map(|diff| {
+                map[diff.unsigned_abs()] += 1;
+                result.1 += 1;
+            })
+            .count();
+        let (mut idx, mut score) = result;
+        diffs
+            .iter()
+            .map(|&diff| {
+                if diff.is_negative() {
+                    map[nums.len().wrapping_add_signed(diff)] += 1;
+                } else {
+                    map[diff.unsigned_abs()] -= 1;
+                }
+                if diff.wrapping_sub_unsigned(idx).is_negative()
+                    && diff
+                        .wrapping_add_unsigned(nums.len())
+                        .wrapping_sub_unsigned(idx)
+                        .is_positive()
+                {
+                    score += 1;
+                }
+                score -= map[idx];
+                idx += 1;
+                if score.gt(&result.1) {
+                    result = (idx, score);
+                }
+            })
+            .count();
+        result.0
+    }
+
     /// 1309 - Decrypt String from Alphabet to Integer Mapping (0 ms 2 MB)
     ///
     /// You are given a string `str` formed by digits and `'#'`. We want to map `str` to English
