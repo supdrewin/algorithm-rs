@@ -14,29 +14,31 @@ impl Solution {
         where
             F: Copy + FnMut(&T, &T) -> bool,
         {
-            let mut idx = right;
-            {
-                let (mut left, mut right) = (left, right);
-                while left < right {
-                    while left < idx && cmp(&vec[left], &vec[idx]) {
-                        left += 1;
-                    }
-                    vec.swap(idx, left);
-                    idx = left;
-                    while idx < right && cmp(&vec[idx], &vec[right]) {
-                        right -= 1;
-                    }
-                    vec.swap(idx, right);
-                    idx = right;
+            let (mut idx1, mut idx2) = (left, right);
+            while idx1 < idx2 {
+                while idx1 < idx2 && cmp(&vec[idx1], &vec[idx2]) {
+                    idx1 += 1;
+                }
+                if idx1 < idx2 {
+                    vec.swap(idx1, idx2);
+                    idx2 -= 1;
+                }
+                while idx1 < idx2 && cmp(&vec[idx1], &vec[idx2]) {
+                    idx2 -= 1;
+                }
+                if idx1 < idx2 {
+                    vec.swap(idx1, idx2);
+                    idx1 += 1;
                 }
             }
-            if left + 1 < idx {
-                sort(vec, cmp, (left, idx - 1));
+            if left + 1 < idx2 {
+                sort(vec, cmp, (left, idx2 - 1));
             }
-            if idx + 1 < right {
-                sort(vec, cmp, (idx + 1, right));
+            if idx1 + 1 < right {
+                sort(vec, cmp, (idx1 + 1, right));
             }
         }
+        assert!(vec.len() > 0);
         sort(vec, cmp, (0, vec.len() - 1));
     }
 
