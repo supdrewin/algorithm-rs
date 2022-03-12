@@ -53,9 +53,14 @@ impl Solution {
         height[find(0)]
     }
 
-    /// Question 2
+    /// Question 2 - Postorder Traversal
     ///
-    ///
+    /// The first step we build a `BTree` from the `preorder` and `inorder`,
+    /// then call the postorder method from the `BTreeNode`. For building a
+    /// `BTree`, we traverse around the `preorder` then we get the index of
+    /// each elements map to the `inorder` for split building the `left` and
+    /// `right` tree node. If map index not found, the `None` matched, then
+    /// we just build a empty node.
     #[rustfmt::skip]
     pub fn get_postorder_traversal<T: Clone + Eq>(
         preorder: &Vec<T>,
@@ -93,7 +98,7 @@ impl Solution {
     /// Question 3
     ///
     ///
-    pub fn recover_lost_records(monks: Vec<(usize, usize)>) {
+    pub fn recover_lost_records(_monks: &Vec<(usize, usize)>) {
         todo!()
     }
 }
