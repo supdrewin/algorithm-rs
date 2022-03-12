@@ -5,7 +5,11 @@ pub struct Solution;
 impl Solution {
     /// Quick Sort Algorithm
     ///
-    /// TODO: Add comments.
+    /// We compare between the first index and the last index. If not compared,
+    /// swap the elements under indices and move a step. After a rotation, the
+    /// first index should equal the last index. Then we sort the left part and
+    /// the right part with same method. Noted that if the src too big it will
+    /// overflow the stack.
     pub fn quick_sort<F, T>(src: &Vec<T>, cmp: F) -> Vec<T>
     where
         F: Copy + FnMut(&T, &T) -> bool,
@@ -47,7 +51,10 @@ impl Solution {
 
     /// Merge Sort Algorithm
     ///
-    /// TODO: Add comments.
+    /// We split the origin to be sorted in two parts, and then
+    /// split each part in two part, and so on until the length
+    /// of each part isn't greater than 1. Then we take elements
+    /// in place for merging.
     pub fn merge_sort<F, T>(src: &Vec<T>, cmp: F) -> Vec<T>
     where
         F: Copy + FnMut(&T, &T) -> bool,
