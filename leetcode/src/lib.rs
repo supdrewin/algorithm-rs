@@ -5,6 +5,33 @@ use std::ptr;
 pub struct Solution;
 
 impl Solution {
+    /// LCP 42 - Circle Game (772 ms 3.7 MB)
+    ///
+    /// toy (x, y, r), cycle (x, y). Simply traverse the toys smaller than
+    /// circles for each circle and filter toys in circles then return the
+    /// count after filter. A toy in a circle if their distance of centres
+    /// isn't greater than their radius subtraction.
+    #[rustfmt::skip]
+    pub fn circle_game(
+        toys: &Vec<(usize, usize, usize)>,
+        circles: &Vec<(usize, usize)>,
+        radius: usize,
+    ) -> usize {
+        toys.iter()
+            .filter(|toy| radius.ge(&toy.2))
+            .filter_map(|toy| {
+                circles
+                    .iter()
+                    .skip_while(|circle| {
+                        circle.0.abs_diff(toy.0).pow(2)
+                            + circle.1.abs_diff(toy.1).pow(2)
+                            > radius.abs_diff(toy.2).pow(2)
+                    })
+                    .next()
+            })
+            .count()
+    }
+
     #[allow(rustdoc::broken_intra_doc_links)]
     /// 798 - Smallest Rotation with Highest Score (12 ms 3.3 MB)
     ///
