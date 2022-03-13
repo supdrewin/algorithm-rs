@@ -5,13 +5,13 @@ use std::{
 
 pub struct BTreeNode<T> {
     value: T,
-    left: Box<Option<BTreeNode<T>>>,
-    right: Box<Option<BTreeNode<T>>>,
+    left: Box<Option<Self>>,
+    right: Box<Option<Self>>,
 }
 
 impl<T> BTreeNode<T> {
-    pub fn new(value: T) -> Box<Option<BTreeNode<T>>> {
-        Box::new(Some(BTreeNode {
+    pub fn new(value: T) -> Box<Option<Self>> {
+        Box::new(Some(Self {
             value,
             left: Box::new(None),
             right: Box::new(None),
@@ -19,10 +19,10 @@ impl<T> BTreeNode<T> {
     }
 
     pub fn build(
-        mut node: Box<Option<BTreeNode<T>>>,
-        left: Box<Option<BTreeNode<T>>>,
-        right: Box<Option<BTreeNode<T>>>,
-    ) -> Box<Option<BTreeNode<T>>> {
+        mut node: Box<Option<Self>>,
+        left: Box<Option<Self>>,
+        right: Box<Option<Self>>,
+    ) -> Box<Option<Self>> {
         if let Some(node) = node.as_mut() {
             node.set_left(left);
             node.set_right(right);
@@ -34,14 +34,14 @@ impl<T> BTreeNode<T> {
         &self.value
     }
 
-    pub fn left(&self) -> Option<&BTreeNode<T>> {
+    pub fn left(&self) -> Option<&Self> {
         match self.left.as_ref() {
             Some(node) => Some(node),
             None => None,
         }
     }
 
-    pub fn right(&self) -> Option<&BTreeNode<T>> {
+    pub fn right(&self) -> Option<&Self> {
         match self.right.as_ref() {
             Some(node) => Some(node),
             None => None,
@@ -52,17 +52,17 @@ impl<T> BTreeNode<T> {
         self.value = value;
     }
 
-    pub fn set_left(&mut self, left: Box<Option<BTreeNode<T>>>) {
+    pub fn set_left(&mut self, left: Box<Option<Self>>) {
         self.left = left;
     }
 
-    pub fn set_right(&mut self, right: Box<Option<BTreeNode<T>>>) {
+    pub fn set_right(&mut self, right: Box<Option<Self>>) {
         self.right = right;
     }
 
     pub fn preorder<F, B>(&self, mut function: F) -> Vec<B>
     where
-        F: FnMut(&BTreeNode<T>) -> B,
+        F: FnMut(&Self) -> B,
     {
         let mut result = Vec::new();
         let mut queue = VecDeque::new();
@@ -81,7 +81,7 @@ impl<T> BTreeNode<T> {
 
     pub fn inorder<F, B>(&self, mut function: F) -> Vec<B>
     where
-        F: FnMut(&BTreeNode<T>) -> B,
+        F: FnMut(&Self) -> B,
     {
         let mut result = Vec::new();
         let mut queue = VecDeque::new();
@@ -108,7 +108,7 @@ impl<T> BTreeNode<T> {
 
     pub fn postorder<F, B>(&self, mut function: F) -> Vec<B>
     where
-        F: FnMut(&BTreeNode<T>) -> B,
+        F: FnMut(&Self) -> B,
     {
         let mut result = Vec::new();
         let mut queue1 = VecDeque::new();
@@ -141,5 +141,45 @@ impl<T> Deref for BTreeNode<T> {
 impl<T> DerefMut for BTreeNode<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.value
+    }
+}
+
+#[test]
+#[rustfmt::skip]
+fn test() {
+    let btree = BTreeNode::build(
+        BTreeNode::new(1),
+        BTreeNode::build(
+            BTreeNode::new(2),
+            BTreeNode::build(
+                BTreeNode::new(4),
+                Box::new(None),
+                BTreeNode::new(7),
+            ),
+            Box::new(None),
+        ),
+        BTreeNode::build(
+            BTreeNode::new(3),
+            BTreeNode::build(
+                BTreeNode::new(5),
+                BTreeNode::new(8),
+                BTreeNode::new(9),
+            ),
+            BTreeNode::new(6),
+        ),
+    );
+    if let Some(root) = btree.as_ref() {
+        assert_eq!(
+            root.preorder(|node| *node.value()),
+            vec![1, 2, 4, 7, 3, 5, 8, 9, 6]
+        );
+        assert_eq!(
+            root.inorder(|node| *node.value()),
+            vec![4, 7, 2, 1, 8, 5, 9, 3, 6]
+        );
+        assert_eq!(
+            root.postorder(|node| *node.value()),
+            vec![7, 4, 2, 8, 9, 5, 6, 3, 1]
+        );
     }
 }

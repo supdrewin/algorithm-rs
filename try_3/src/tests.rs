@@ -1,4 +1,4 @@
-use crate::{BTreeNode, Solution};
+use crate::Solution;
 
 #[test]
 fn find_all_suspects_1() {
@@ -45,44 +45,4 @@ fn get_postorder_traversal() {
         ),
         vec![7, 4, 2, 8, 9, 5, 6, 3, 1]
     );
-}
-
-#[test]
-#[rustfmt::skip]
-fn node() {
-    let tree = BTreeNode::build(
-        BTreeNode::new(1),
-        BTreeNode::build(
-            BTreeNode::new(2),
-            BTreeNode::build(
-                BTreeNode::new(4),
-                Box::new(None),
-                BTreeNode::new(7),
-            ),
-            Box::new(None),
-        ),
-        BTreeNode::build(
-            BTreeNode::new(3),
-            BTreeNode::build(
-                BTreeNode::new(5),
-                BTreeNode::new(8),
-                BTreeNode::new(9),
-            ),
-            BTreeNode::new(6),
-        ),
-    );
-    if let Some(root) = tree.as_ref() {
-        assert_eq!(
-            root.preorder(|node| *node.value()),
-            vec![1, 2, 4, 7, 3, 5, 8, 9, 6]
-        );
-        assert_eq!(
-            root.inorder(|node| *node.value()),
-            vec![4, 7, 2, 1, 8, 5, 9, 3, 6]
-        );
-        assert_eq!(
-            root.postorder(|node| *node.value()),
-            vec![7, 4, 2, 8, 9, 5, 6, 3, 1]
-        );
-    }
 }

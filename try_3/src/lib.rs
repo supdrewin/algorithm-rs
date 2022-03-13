@@ -1,4 +1,5 @@
 pub mod btree;
+pub mod treap;
 
 use btree::BTreeNode;
 
