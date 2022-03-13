@@ -12,15 +12,9 @@ impl Solution {
     /// height of each index should be recorded. Next step we traverse each
     /// groups and union the students. The Question says student 0 always a
     /// suspect. So the result is the height if the branch of index 0.
-    #[rustfmt::skip]
-    pub fn find_all_suspects(
-        groups: &Vec<Vec<usize>>,
-        total: usize)
-    -> usize {
+    pub fn find_all_suspects(groups: &Vec<Vec<usize>>, total: usize) -> usize {
         assert!(total > 0);
-        let mut set = (0..total)
-            .into_iter()
-            .collect::<Vec<usize>>();
+        let mut set = (0..total).into_iter().collect::<Vec<usize>>();
         let set = set.as_mut_ptr();
         let find = |idx: usize| unsafe {
             let mut idx = idx;
@@ -34,22 +28,18 @@ impl Solution {
             idx
         };
         let mut height = vec![1; total];
-        groups
-            .iter()
-            .map(|students| {
-                students
-                    .iter()
-                    .zip(students.iter().skip(1))
-                    .map(|(&idx1, &idx2)| unsafe {
-                        let (idx1, idx2) = (find(idx1), find(idx2));
-                        idx1.ne(&idx2).then(|| {
-                            set.offset(idx1 as isize).write(idx2);
-                            height[idx2] += 1;
-                        });
-                    })
-                    .count();
-            })
-            .count();
+        groups.iter().for_each(|students| {
+            students
+                .iter()
+                .zip(students.iter().skip(1))
+                .for_each(|(&idx1, &idx2)| unsafe {
+                    let (idx1, idx2) = (find(idx1), find(idx2));
+                    idx1.ne(&idx2).then(|| {
+                        set.offset(idx1 as isize).write(idx2);
+                        height[idx2] += 1;
+                    });
+                });
+        });
         height[find(0)]
     }
 
