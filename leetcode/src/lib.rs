@@ -33,7 +33,7 @@ impl Solution {
     }
 
     #[allow(rustdoc::broken_intra_doc_links)]
-    /// 798 - Smallest Rotation with Highest Score (12 ms 3.3 MB)
+    /// 798 - Smallest Rotation with Highest Score (4 ms 4 MB)
     ///
     /// You are given anarray nums. You can rotate it by a non-negative integer k so that the
     /// array becomes [nums[k], nums[k + 1], ... nums[nums.length - 1], nums[0], nums[1], ...,
@@ -62,37 +62,35 @@ impl Solution {
     /// after a rotation. After changes, `k += 1` (a rotation has finished). If current score
     /// greater than max score, then update the `result`.
     pub fn best_rotation(nums: &Vec<usize>) -> usize {
-        let mut result = (0, 0);
         let diffs = nums
             .iter()
             .zip(0isize..)
             .map(|(&num, idx)| idx.wrapping_sub_unsigned(num))
             .collect::<Vec<isize>>();
-        let mut map = vec![0isize; nums.len()];
-        diffs
-            .iter()
-            .filter(|diff| !diff.is_negative())
-            .map(|diff| {
-                map[diff.unsigned_abs()] += 1;
-                result.1 += 1;
-            })
-            .count();
+        let mut map = vec![0usize; nums.len()];
+        let mut result = (
+            0usize,
+            diffs
+                .iter()
+                .filter(|diff| !diff.is_negative())
+                .map(|diff| map[diff.unsigned_abs()] += 1)
+                .count(),
+        );
         let (mut idx, mut score) = result;
-        diffs
-            .iter()
-            .map(|&diff| {
-                diff.is_negative()
-                    .then(|| map[nums.len().wrapping_add_signed(diff)] += 1)
-                    .is_none()
-                    .then(|| map[diff.unsigned_abs()] -= 1);
-                diff.wrapping_sub_unsigned(idx)
-                    .is_negative()
-                    .then(|| score += 1);
-                score -= map[idx];
-                idx += 1;
-                score.gt(&result.1).then(|| result = (idx, score));
-            })
-            .count();
+        diffs.iter().for_each(|&diff| {
+            diff.wrapping_sub_unsigned(idx)
+                .is_negative()
+                .then(|| score += 1);
+            match diff.is_negative() {
+                true => map[nums.len().wrapping_add_signed(diff)] += 1,
+                false => map[diff.unsigned_abs()] -= 1,
+            }
+            score -= map[idx];
+            idx += 1;
+            if score > result.1 {
+                result = (idx, score);
+            }
+        });
         result.0
     }
 
