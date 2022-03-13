@@ -63,7 +63,7 @@ impl Solution {
             left: usize,
             right: usize,
             cnt: &mut usize,
-        ) -> Box<Option<BTreeNode<T>>> {
+        ) -> Option<Box<BTreeNode<T>>> {
             if let Some(idx) = inorder[left..right]
                 .iter()
                 .zip(left..right)
@@ -78,7 +78,7 @@ impl Solution {
                     build(preorder, inorder, idx + 1, right, cnt),
                 )
             } else {
-                Box::new(None)
+                None
             }
         }
         build(preorder, inorder, 0, preorder.len(), &mut 0)

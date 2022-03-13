@@ -5,25 +5,25 @@ use std::{
 
 pub struct BTreeNode<T> {
     value: T,
-    left: Box<Option<Self>>,
-    right: Box<Option<Self>>,
+    left: Option<Box<Self>>,
+    right: Option<Box<Self>>,
 }
 
 impl<T> BTreeNode<T> {
-    pub fn new(value: T) -> Box<Option<Self>> {
-        Box::new(Some(Self {
+    pub fn new(value: T) -> Option<Box<Self>> {
+        Some(Box::new(Self {
             value,
-            left: Box::new(None),
-            right: Box::new(None),
+            left: None,
+            right: None,
         }))
     }
 
     pub fn build(
-        mut node: Box<Option<Self>>,
-        left: Box<Option<Self>>,
-        right: Box<Option<Self>>,
-    ) -> Box<Option<Self>> {
-        if let Some(node) = node.as_mut() {
+        mut node: Option<Box<Self>>,
+        left: Option<Box<Self>>,
+        right: Option<Box<Self>>,
+    ) -> Option<Box<Self>> {
+        if let Some(node) = &mut node {
             node.set_left(left);
             node.set_right(right);
         }
@@ -35,14 +35,14 @@ impl<T> BTreeNode<T> {
     }
 
     pub fn left(&self) -> Option<&Self> {
-        match self.left.as_ref() {
+        match &self.left {
             Some(node) => Some(node),
             None => None,
         }
     }
 
     pub fn right(&self) -> Option<&Self> {
-        match self.right.as_ref() {
+        match &self.right {
             Some(node) => Some(node),
             None => None,
         }
@@ -52,11 +52,11 @@ impl<T> BTreeNode<T> {
         self.value = value;
     }
 
-    pub fn set_left(&mut self, left: Box<Option<Self>>) {
+    pub fn set_left(&mut self, left: Option<Box<Self>>) {
         self.left = left;
     }
 
-    pub fn set_right(&mut self, right: Box<Option<Self>>) {
+    pub fn set_right(&mut self, right: Option<Box<Self>>) {
         self.right = right;
     }
 
@@ -153,10 +153,10 @@ fn test() {
             BTreeNode::new(2),
             BTreeNode::build(
                 BTreeNode::new(4),
-                Box::new(None),
+                None,
                 BTreeNode::new(7),
             ),
-            Box::new(None),
+            None,
         ),
         BTreeNode::build(
             BTreeNode::new(3),
