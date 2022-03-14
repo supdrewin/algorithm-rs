@@ -1,4 +1,4 @@
-# Algorithm20 Rust
+# Algorithm Rust
 
 To test it:
 
