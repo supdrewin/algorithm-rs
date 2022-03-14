@@ -227,36 +227,32 @@ impl Solution {
                     deque.push_back((vec, next, step + 1));
                 }
             };
-            while {
-                match deque1.pop_front() {
-                    Some((src, pos1, step1)) => {
-                        match map.get(&src) {
-                            Some((2, step2)) => return Some(step1 + step2),
-                            None => {
-                                map.insert(src.clone(), (1, step1));
-                                search(&src, &mut deque1, pos1, step1);
-                            }
-                            _ => (),
+            while match deque1.pop_front() {
+                Some((src, pos1, step1)) => {
+                    match map.get(&src) {
+                        Some((2, step2)) => return Some(step1 + step2),
+                        None => {
+                            map.insert(src.clone(), (1, step1));
+                            search(&src, &mut deque1, pos1, step1);
                         }
-                        true
+                        _ => (),
                     }
-                    None => false,
+                    true
                 }
-            } && {
-                match deque2.pop_front() {
-                    Some((dist, pos2, step2)) => {
-                        match map.get(&dist) {
-                            Some((1, step1)) => return Some(step1 + step2),
-                            None => {
-                                map.insert(dist.clone(), (2, step2));
-                                search(&dist, &mut deque2, pos2, step2);
-                            }
-                            _ => (),
+                None => false,
+            } && match deque2.pop_front() {
+                Some((dist, pos2, step2)) => {
+                    match map.get(&dist) {
+                        Some((1, step1)) => return Some(step1 + step2),
+                        None => {
+                            map.insert(dist.clone(), (2, step2));
+                            search(&dist, &mut deque2, pos2, step2);
                         }
-                        true
+                        _ => (),
                     }
-                    None => false,
+                    true
                 }
+                None => false,
             } {}
         }
         None

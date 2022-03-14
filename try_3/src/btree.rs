@@ -86,22 +86,20 @@ impl<T> BTreeNode<T> {
         let mut result = Vec::new();
         let mut queue = VecDeque::new();
         let mut cur = Some(self);
-        while {
-            match cur {
+        while match cur {
+            Some(node) => {
+                queue.push_back(node);
+                cur = node.left();
+                true
+            }
+            None => match queue.pop_back() {
                 Some(node) => {
-                    queue.push_back(node);
-                    cur = node.left();
+                    result.push(function(node));
+                    cur = node.right();
                     true
                 }
-                None => match queue.pop_back() {
-                    Some(node) => {
-                        result.push(function(node));
-                        cur = node.right();
-                        true
-                    }
-                    None => false,
-                },
-            }
+                None => false,
+            },
         } {}
         result
     }
