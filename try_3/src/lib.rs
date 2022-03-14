@@ -2,6 +2,7 @@ pub mod btree;
 pub mod treap;
 
 use btree::BTreeNode;
+use std::collections::BTreeMap;
 
 pub struct Solution;
 
@@ -89,8 +90,31 @@ impl Solution {
     /// Question 3
     ///
     ///
-    pub fn recover_lost_records(_monks: &Vec<(usize, usize)>) {
-        todo!()
+    pub fn recover_lost_records(monks: &Vec<(usize, usize)>) -> Vec<(usize, usize)> {
+        let mut map = BTreeMap::new();
+        map.insert(1_000_000_000, 1);
+        monks
+            .iter()
+            .map(|&(id, lv)| {
+                map.insert(lv, id);
+                let prev = map.range(..lv).next_back();
+                let next = map.range(lv + 1..).next();
+                (
+                    id,
+                    *match prev {
+                        Some(prev) => match next {
+                            Some(next) => match prev.0 + next.0 < lv << 1 {
+                                false => prev,
+                                true => next,
+                            },
+                            None => prev,
+                        },
+                        None => next.unwrap(),
+                    }
+                    .1,
+                )
+            })
+            .collect()
     }
 }
 
