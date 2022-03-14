@@ -3,6 +3,7 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
+#[derive(Debug)]
 pub struct BTreeNode<T> {
     value: T,
     left: Option<Box<Self>>,
@@ -167,19 +168,18 @@ fn test() {
             ),
             BTreeNode::new(6),
         ),
+    )
+    .unwrap();
+    assert_eq!(
+        btree.preorder(|node| **node),
+        vec![1, 2, 4, 7, 3, 5, 8, 9, 6]
     );
-    if let Some(root) = btree.as_ref() {
-        assert_eq!(
-            root.preorder(|node| *node.value()),
-            vec![1, 2, 4, 7, 3, 5, 8, 9, 6]
-        );
-        assert_eq!(
-            root.inorder(|node| *node.value()),
-            vec![4, 7, 2, 1, 8, 5, 9, 3, 6]
-        );
-        assert_eq!(
-            root.postorder(|node| *node.value()),
-            vec![7, 4, 2, 8, 9, 5, 6, 3, 1]
-        );
-    }
+    assert_eq!(
+        btree.inorder(|node| **node),
+        vec![4, 7, 2, 1, 8, 5, 9, 3, 6]
+    );
+    assert_eq!(
+        btree.postorder(|node| **node),
+        vec![7, 4, 2, 8, 9, 5, 6, 3, 1]
+    );
 }

@@ -46,3 +46,11 @@ fn get_postorder_traversal() {
         vec![7, 4, 2, 8, 9, 5, 6, 3, 1]
     );
 }
+
+#[test]
+fn recover_lost_records() {
+    assert_eq!(
+        Solution::recover_lost_records(&vec![(2, 1), (3, 3), (4, 2)]),
+        vec![(2, 1), (3, 2), (4, 2)]
+    );
+}
