@@ -1,6 +1,6 @@
 #![feature(mixed_integer_ops)]
 
-use std::ptr;
+use std::{cmp::Ordering, collections::HashMap, ptr};
 
 pub struct Solution;
 
@@ -30,6 +30,48 @@ impl Solution {
                     .next()
             })
             .count()
+    }
+
+    /// 599 - Minimum Index Sum of Two Lists (8 ms 2.3 MB)
+    ///
+    /// Suppose Andy and Doris want to choose a restaurant for dinner,
+    /// and they both have a list of favorite restaurants represented
+    /// by strings.
+    ///
+    /// You need to help them find out their common interest with the
+    /// least list index sum. If there is a choice tie between answers,
+    /// output all of them with no order requirement. You could assume
+    /// there always exists an answer.
+    ///
+    /// Firstly, we entry the `list2` into a hash map. Then we traverse
+    /// the `list1` and find the same keys from `list2`. We first guess
+    /// the min index sum is `usize::MAX`, then if a new index sum less
+    /// than old one, we clear the `result` and then push the `key` into
+    /// it, or a index sum is same as the `min` we just push `key` into
+    /// it but not clear the `result`.
+    pub fn find_restaurant(list1: Vec<String>, list2: Vec<String>) -> Vec<String> {
+        let mut result = Vec::new();
+        let mut min = usize::MAX;
+        let map = list2
+            .into_iter()
+            .enumerate()
+            .map(|item| (item.1, item.0))
+            .collect::<HashMap<_, _>>();
+        list1.into_iter().enumerate().for_each(|(idx1, key)| {
+            if let Some(idx2) = map.get(&key) {
+                let idx = idx1 + idx2;
+                match idx.cmp(&min) {
+                    Ordering::Less => {
+                        result.clear();
+                        result.push(key);
+                        min = idx;
+                    }
+                    Ordering::Equal => result.push(key),
+                    _ => (),
+                }
+            }
+        });
+        result
     }
 
     #[allow(rustdoc::broken_intra_doc_links)]
