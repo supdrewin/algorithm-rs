@@ -16,7 +16,7 @@ impl Solution {
     /// suspect. So the result is the height if the branch of index 0.
     pub fn find_all_suspects(groups: &Vec<Vec<usize>>, total: usize) -> usize {
         assert!(total > 0);
-        let mut set = (0..total).into_iter().collect::<Vec<usize>>();
+        let mut set = (0..total).into_iter().collect::<Vec<_>>();
         let set = set.as_mut_ptr();
         let find = |idx: usize| unsafe {
             let mut idx = idx;
