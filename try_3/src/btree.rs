@@ -1,17 +1,16 @@
-use std::{
-    collections::VecDeque,
-    ops::{Deref, DerefMut},
-};
+use std::collections::VecDeque;
 
-pub struct BTreeNode<T> {
-    value: T,
-    left: Option<Box<Self>>,
-    right: Option<Box<Self>>,
+pub struct BTreeNode<K, V> {
+    pub key: K,
+    pub value: V,
+    pub left: Option<Box<Self>>,
+    pub right: Option<Box<Self>>,
 }
 
-impl<T> BTreeNode<T> {
-    pub fn new(value: T) -> Option<Box<Self>> {
+impl<K, V> BTreeNode<K, V> {
+    pub fn new(key: K, value: V) -> Option<Box<Self>> {
         Some(Box::new(Self {
+            key,
             value,
             left: None,
             right: None,
@@ -24,14 +23,10 @@ impl<T> BTreeNode<T> {
         right: Option<Box<Self>>,
     ) -> Option<Box<Self>> {
         if let Some(node) = &mut node {
-            node.set_left(left);
-            node.set_right(right);
+            node.left = left;
+            node.right = right;
         }
         node
-    }
-
-    pub fn value(&self) -> &T {
-        &self.value
     }
 
     pub fn left(&self) -> Option<&Self> {
@@ -48,97 +43,115 @@ impl<T> BTreeNode<T> {
         }
     }
 
-    pub fn set_value(&mut self, value: T) {
-        self.value = value;
+    pub fn preorder(&self) -> PreOrder<K, V> {
+        PreOrder::new(self)
     }
 
-    pub fn set_left(&mut self, left: Option<Box<Self>>) {
-        self.left = left;
+    pub fn inorder(&self) -> InOrder<K, V> {
+        InOrder::new(self)
     }
 
-    pub fn set_right(&mut self, right: Option<Box<Self>>) {
-        self.right = right;
-    }
-
-    pub fn preorder<F, B>(&self, mut function: F) -> Vec<B>
-    where
-        F: FnMut(&Self) -> B,
-    {
-        let mut result = Vec::new();
-        let mut queue = VecDeque::new();
-        queue.push_back(self);
-        while let Some(node) = queue.pop_back() {
-            result.push(function(node));
-            if let Some(right) = node.right() {
-                queue.push_back(right);
-            }
-            if let Some(left) = node.left() {
-                queue.push_back(left);
-            }
-        }
-        result
-    }
-
-    pub fn inorder<F, B>(&self, mut function: F) -> Vec<B>
-    where
-        F: FnMut(&Self) -> B,
-    {
-        let mut result = Vec::new();
-        let mut queue = VecDeque::new();
-        let mut cur = Some(self);
-        while match cur {
-            Some(node) => {
-                queue.push_back(node);
-                cur = node.left();
-                true
-            }
-            None => match queue.pop_back() {
-                Some(node) => {
-                    result.push(function(node));
-                    cur = node.right();
-                    true
-                }
-                None => false,
-            },
-        } {}
-        result
-    }
-
-    pub fn postorder<F, B>(&self, mut function: F) -> Vec<B>
-    where
-        F: FnMut(&Self) -> B,
-    {
-        let mut result = Vec::new();
-        let mut queue1 = VecDeque::new();
-        let mut queue2 = VecDeque::new();
-        queue1.push_back(self);
-        while let Some(node) = queue1.pop_back() {
-            queue2.push_back(node);
-            if let Some(left) = node.left() {
-                queue1.push_back(left);
-            }
-            if let Some(right) = node.right() {
-                queue1.push_back(right);
-            }
-        }
-        while let Some(node) = queue2.pop_back() {
-            result.push(function(node));
-        }
-        result
+    pub fn postorder(&self) -> PostOrder<K, V> {
+        PostOrder::new(self)
     }
 }
 
-impl<T> Deref for BTreeNode<T> {
-    type Target = T;
+pub struct PreOrder<'a, K, V> {
+    stack: VecDeque<Option<&'a BTreeNode<K, V>>>,
+}
 
-    fn deref(&self) -> &Self::Target {
-        &self.value
+impl<'a, K, V> PreOrder<'a, K, V> {
+    pub fn new(node: &'a BTreeNode<K, V>) -> Self {
+        let mut stack = VecDeque::new();
+        stack.push_back(Some(node));
+        Self { stack }
     }
 }
 
-impl<T> DerefMut for BTreeNode<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.value
+impl<'a, K, V> Iterator for PreOrder<'a, K, V> {
+    type Item = &'a BTreeNode<K, V>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(Some(node)) = self.stack.pop_back() {
+            if let Some(node) = node.right() {
+                self.stack.push_back(Some(node));
+            }
+            if let Some(node) = node.left() {
+                self.stack.push_back(Some(node));
+            }
+            self.stack.push_back(Some(node));
+            self.stack.push_back(None);
+        }
+        match self.stack.pop_back() {
+            Some(node) => node,
+            None => None,
+        }
+    }
+}
+
+pub struct InOrder<'a, K, V> {
+    stack: VecDeque<Option<&'a BTreeNode<K, V>>>,
+}
+
+impl<'a, K, V> InOrder<'a, K, V> {
+    pub fn new(node: &'a BTreeNode<K, V>) -> Self {
+        let mut stack = VecDeque::new();
+        stack.push_back(Some(node));
+        Self { stack }
+    }
+}
+
+impl<'a, K, V> Iterator for InOrder<'a, K, V> {
+    type Item = &'a BTreeNode<K, V>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(Some(node)) = self.stack.pop_back() {
+            if let Some(node) = node.right() {
+                self.stack.push_back(Some(node));
+            }
+            self.stack.push_back(Some(node));
+            self.stack.push_back(None);
+            if let Some(node) = node.left() {
+                self.stack.push_back(Some(node));
+            }
+        }
+        match self.stack.pop_back() {
+            Some(node) => node,
+            None => None,
+        }
+    }
+}
+
+pub struct PostOrder<'a, K, V> {
+    stack: VecDeque<Option<&'a BTreeNode<K, V>>>,
+}
+
+impl<'a, K, V> PostOrder<'a, K, V> {
+    pub fn new(node: &'a BTreeNode<K, V>) -> Self {
+        let mut stack = VecDeque::new();
+        stack.push_back(Some(node));
+        Self { stack }
+    }
+}
+
+impl<'a, K, V> Iterator for PostOrder<'a, K, V> {
+    type Item = &'a BTreeNode<K, V>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(Some(node)) = self.stack.pop_back() {
+            self.stack.push_back(Some(node));
+            self.stack.push_back(None);
+            if let Some(node) = node.right() {
+                self.stack.push_back(Some(node));
+            }
+            if let Some(node) = node.left() {
+                self.stack.push_back(Some(node));
+            }
+        }
+        match self.stack.pop_back() {
+            Some(node) => node,
+            None => None,
+        }
     }
 }
 
@@ -146,37 +159,37 @@ impl<T> DerefMut for BTreeNode<T> {
 #[rustfmt::skip]
 fn test() {
     let btree = BTreeNode::build(
-        BTreeNode::new(1),
+        BTreeNode::new(1, ()),
         BTreeNode::build(
-            BTreeNode::new(2),
+            BTreeNode::new(2, ()),
             BTreeNode::build(
-                BTreeNode::new(4),
+                BTreeNode::new(4, ()),
                 None,
-                BTreeNode::new(7),
+                BTreeNode::new(7, ()),
             ),
             None,
         ),
         BTreeNode::build(
-            BTreeNode::new(3),
+            BTreeNode::new(3, ()),
             BTreeNode::build(
-                BTreeNode::new(5),
-                BTreeNode::new(8),
-                BTreeNode::new(9),
+                BTreeNode::new(5, ()),
+                BTreeNode::new(8, ()),
+                BTreeNode::new(9, ()),
             ),
-            BTreeNode::new(6),
+            BTreeNode::new(6, ()),
         ),
     )
     .unwrap();
     assert_eq!(
-        btree.preorder(|node| **node),
+        btree.preorder().map(|node| node.key).collect::<Vec<_>>(),
         vec![1, 2, 4, 7, 3, 5, 8, 9, 6]
     );
     assert_eq!(
-        btree.inorder(|node| **node),
+        btree.inorder().map(|node| node.key).collect::<Vec<_>>(),
         vec![4, 7, 2, 1, 8, 5, 9, 3, 6]
     );
     assert_eq!(
-        btree.postorder(|node| **node),
+        btree.postorder().map(|node| node.key).collect::<Vec<_>>(),
         vec![7, 4, 2, 8, 9, 5, 6, 3, 1]
     );
 }

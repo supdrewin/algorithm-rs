@@ -56,15 +56,15 @@ impl Solution {
     #[rustfmt::skip]
     pub fn get_postorder_traversal<T: Clone + Eq>(
         preorder: &Vec<T>,
-        inorder: &Vec<T>)
-    -> Vec<T> {
+        inorder: &Vec<T>,
+    ) -> Vec<T> {
         fn build<T: Clone + Eq>(
             preorder: &Vec<T>,
             inorder: &Vec<T>,
             left: usize,
             right: usize,
             cnt: &mut usize,
-        ) -> Option<Box<BTreeNode<T>>> {
+        ) -> Option<Box<BTreeNode<T, ()>>> {
             if let Some(idx) = inorder[left..right]
                 .iter()
                 .zip(left..right)
@@ -74,7 +74,7 @@ impl Solution {
             {
                 *cnt += 1;
                 BTreeNode::build(
-                    BTreeNode::new(inorder[idx].clone()),
+                    BTreeNode::new(inorder[idx].clone(), ()),
                     build(preorder, inorder, left, idx, cnt),
                     build(preorder, inorder, idx + 1, right, cnt),
                 )
@@ -82,14 +82,23 @@ impl Solution {
                 None
             }
         }
-        build(preorder, inorder, 0, preorder.len(), &mut 0)
-            .unwrap()
-            .postorder(|node| node.value().clone())
+        match build(preorder, inorder, 0, preorder.len(), &mut 0) {
+            Some(btree) => btree
+                .postorder()
+                .map(|node| node.key.clone())
+                .collect(),
+            None => Vec::new(),
+        }
     }
 
-    /// Question 3
+    /// Question 3 - hdu 4585 "Shaolin"
     ///
-    ///
+    /// This problem can be simply solved by `Binary Search Tree`.
+    /// On this moment, I'm  lazy to write a `treap` (WIP). So we
+    /// use `BTreeMap` from Standard Library instead. Firstly, We
+    /// create a `BtreeMap` and insert the Master (Lv 10^9, ID 1).
+    /// Then traversing each monk, we insert his (Lv, ID) and then
+    /// get the closest monk's ID by compare their level.
     pub fn recover_lost_records(monks: &Vec<(usize, usize)>) -> Vec<(usize, usize)> {
         let mut map = BTreeMap::new();
         map.insert(1_000_000_000, 1);
