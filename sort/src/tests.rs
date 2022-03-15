@@ -4,7 +4,7 @@ use rand::prelude::*;
 #[test]
 fn quick_sort_1() {
     assert!(Solution::quick_sort(
-        &(-10_000..10_000).into_iter().collect::<Vec<i16>>(),
+        &(-10_000..10_000).into_iter().collect::<Vec<_>>(),
         |a, b| a < b
     )
     .is_sorted());
@@ -13,7 +13,7 @@ fn quick_sort_1() {
 #[test]
 fn quick_sort_2() {
     assert!(Solution::quick_sort(
-        &(-10_000..10_000).into_iter().collect::<Vec<i16>>(),
+        &(-10_000..10_000).into_iter().collect::<Vec<_>>(),
         |a, b| a > b
     )
     .is_sorted_by(|a, b| b.partial_cmp(a)));
@@ -25,7 +25,7 @@ fn quick_sort_3() {
         &(0..2_000_000)
             .into_iter()
             .map(|_| thread_rng().gen_range(-1_000_000..1_000_000))
-            .collect::<Vec<i32>>(),
+            .collect::<Vec<_>>(),
         |a, b| a < b
     )
     .is_sorted());
@@ -34,7 +34,7 @@ fn quick_sort_3() {
 #[test]
 fn merge_sort_1() {
     assert!(Solution::merge_sort(
-        &(-1_000_000..1_000_000).into_iter().collect::<Vec<i32>>(),
+        &(-1_000_000..1_000_000).into_iter().collect::<Vec<_>>(),
         |a, b| a < b,
     )
     .is_sorted());
@@ -43,7 +43,7 @@ fn merge_sort_1() {
 #[test]
 fn merge_sort_2() {
     assert!(Solution::merge_sort(
-        &(-1_000_000..1_000_000).into_iter().collect::<Vec<i32>>(),
+        &(-1_000_000..1_000_000).into_iter().collect::<Vec<_>>(),
         |a, b| a > b,
     )
     .is_sorted_by(|a, b| b.partial_cmp(a)));
@@ -55,7 +55,7 @@ fn merge_sort_3() {
         &(0..2_000_000)
             .into_iter()
             .map(|_| thread_rng().gen_range(-1_000_000..1_000_000))
-            .collect::<Vec<i32>>(),
+            .collect::<Vec<_>>(),
         |a, b| a < b
     )
     .is_sorted());

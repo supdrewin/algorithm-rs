@@ -108,7 +108,7 @@ impl Solution {
             .iter()
             .zip(0isize..)
             .map(|(&num, idx)| idx.wrapping_sub_unsigned(num))
-            .collect::<Vec<isize>>();
+            .collect::<Vec<_>>();
         let mut map = vec![0usize; nums.len()];
         let mut result = (
             0usize,
@@ -206,7 +206,7 @@ impl Solution {
         queries: &Vec<(usize, usize)>
     ) -> Vec<usize> {
         let mut cnt = 0;
-        let map: Vec<usize> = str
+        let map = str
             .bytes()
             .into_iter()
             .map(|c| {
@@ -215,9 +215,9 @@ impl Solution {
                 }
                 cnt
             })
-            .collect();
+            .collect::<Vec<_>>();
         let mut idx = None;
-        let left: Vec<Option<usize>> = str
+        let left = str
             .bytes()
             .enumerate()
             .map(|(i, c)| {
@@ -226,7 +226,7 @@ impl Solution {
                 }
                 idx
             })
-            .collect();
+            .collect::<Vec<_>>();
         idx = None;
         let mut right = vec![None; str.len()];
         for (i, c) in str.bytes().enumerate().rev() {

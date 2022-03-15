@@ -69,7 +69,7 @@ impl Solution {
                 if part.len() > 1 {
                     sort(part.split_at(part.len() >> 1), cmp)
                 } else {
-                    part.iter().map(|val| val.clone()).collect::<Vec<T>>()
+                    part.iter().map(|val| val.clone()).collect::<Vec<_>>()
                 }
             };
             let part1 = sort(part1);

@@ -186,7 +186,7 @@ impl Solution {
             let mut vec = vec
                 .into_iter()
                 .map(|v| map.get(v).expect("Board is invalid!"))
-                .collect::<Vec<&usize>>();
+                .collect::<Vec<_>>();
             let mut cnt = 0usize;
             for end in (1..vec.len()).rev() {
                 let bak = cnt;
