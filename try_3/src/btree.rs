@@ -1,16 +1,14 @@
 use std::collections::VecDeque;
 
-pub struct BTreeNode<K, V> {
-    pub key: K,
-    pub value: V,
+pub struct BTreeNode<T> {
+    pub value: T,
     pub left: Option<Box<Self>>,
     pub right: Option<Box<Self>>,
 }
 
-impl<K, V> BTreeNode<K, V> {
-    pub fn new(key: K, value: V) -> Option<Box<Self>> {
+impl<T> BTreeNode<T> {
+    pub fn new(value: T) -> Option<Box<Self>> {
         Some(Box::new(Self {
-            key,
             value,
             left: None,
             right: None,
@@ -29,54 +27,40 @@ impl<K, V> BTreeNode<K, V> {
         node
     }
 
-    pub fn left(&self) -> Option<&Self> {
-        match &self.left {
-            Some(node) => Some(node),
-            None => None,
-        }
-    }
-
-    pub fn right(&self) -> Option<&Self> {
-        match &self.right {
-            Some(node) => Some(node),
-            None => None,
-        }
-    }
-
-    pub fn preorder(&self) -> PreOrder<K, V> {
+    pub fn preorder(&self) -> PreOrder<T> {
         PreOrder::new(self)
     }
 
-    pub fn inorder(&self) -> InOrder<K, V> {
+    pub fn inorder(&self) -> InOrder<T> {
         InOrder::new(self)
     }
 
-    pub fn postorder(&self) -> PostOrder<K, V> {
+    pub fn postorder(&self) -> PostOrder<T> {
         PostOrder::new(self)
     }
 }
 
-pub struct PreOrder<'a, K, V> {
-    stack: VecDeque<Option<&'a BTreeNode<K, V>>>,
+pub struct PreOrder<'a, T> {
+    stack: VecDeque<Option<&'a BTreeNode<T>>>,
 }
 
-impl<'a, K, V> PreOrder<'a, K, V> {
-    pub fn new(node: &'a BTreeNode<K, V>) -> Self {
+impl<'a, T> PreOrder<'a, T> {
+    pub fn new(node: &'a BTreeNode<T>) -> Self {
         let mut stack = VecDeque::new();
         stack.push_back(Some(node));
         Self { stack }
     }
 }
 
-impl<'a, K, V> Iterator for PreOrder<'a, K, V> {
-    type Item = &'a BTreeNode<K, V>;
+impl<'a, T> Iterator for PreOrder<'a, T> {
+    type Item = &'a BTreeNode<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(Some(node)) = self.stack.pop_back() {
-            if let Some(node) = node.right() {
+            if let Some(node) = &node.right {
                 self.stack.push_back(Some(node));
             }
-            if let Some(node) = node.left() {
+            if let Some(node) = &node.left {
                 self.stack.push_back(Some(node));
             }
             self.stack.push_back(Some(node));
@@ -89,29 +73,29 @@ impl<'a, K, V> Iterator for PreOrder<'a, K, V> {
     }
 }
 
-pub struct InOrder<'a, K, V> {
-    stack: VecDeque<Option<&'a BTreeNode<K, V>>>,
+pub struct InOrder<'a, T> {
+    stack: VecDeque<Option<&'a BTreeNode<T>>>,
 }
 
-impl<'a, K, V> InOrder<'a, K, V> {
-    pub fn new(node: &'a BTreeNode<K, V>) -> Self {
+impl<'a, T> InOrder<'a, T> {
+    pub fn new(node: &'a BTreeNode<T>) -> Self {
         let mut stack = VecDeque::new();
         stack.push_back(Some(node));
         Self { stack }
     }
 }
 
-impl<'a, K, V> Iterator for InOrder<'a, K, V> {
-    type Item = &'a BTreeNode<K, V>;
+impl<'a, T> Iterator for InOrder<'a, T> {
+    type Item = &'a BTreeNode<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(Some(node)) = self.stack.pop_back() {
-            if let Some(node) = node.right() {
+            if let Some(node) = &node.right {
                 self.stack.push_back(Some(node));
             }
             self.stack.push_back(Some(node));
             self.stack.push_back(None);
-            if let Some(node) = node.left() {
+            if let Some(node) = &node.left {
                 self.stack.push_back(Some(node));
             }
         }
@@ -122,29 +106,29 @@ impl<'a, K, V> Iterator for InOrder<'a, K, V> {
     }
 }
 
-pub struct PostOrder<'a, K, V> {
-    stack: VecDeque<Option<&'a BTreeNode<K, V>>>,
+pub struct PostOrder<'a, T> {
+    stack: VecDeque<Option<&'a BTreeNode<T>>>,
 }
 
-impl<'a, K, V> PostOrder<'a, K, V> {
-    pub fn new(node: &'a BTreeNode<K, V>) -> Self {
+impl<'a, T> PostOrder<'a, T> {
+    pub fn new(node: &'a BTreeNode<T>) -> Self {
         let mut stack = VecDeque::new();
         stack.push_back(Some(node));
         Self { stack }
     }
 }
 
-impl<'a, K, V> Iterator for PostOrder<'a, K, V> {
-    type Item = &'a BTreeNode<K, V>;
+impl<'a, T> Iterator for PostOrder<'a, T> {
+    type Item = &'a BTreeNode<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(Some(node)) = self.stack.pop_back() {
             self.stack.push_back(Some(node));
             self.stack.push_back(None);
-            if let Some(node) = node.right() {
+            if let Some(node) = &node.right {
                 self.stack.push_back(Some(node));
             }
-            if let Some(node) = node.left() {
+            if let Some(node) = &node.left {
                 self.stack.push_back(Some(node));
             }
         }
@@ -159,37 +143,37 @@ impl<'a, K, V> Iterator for PostOrder<'a, K, V> {
 #[rustfmt::skip]
 fn test() {
     let btree = BTreeNode::build(
-        BTreeNode::new(1, ()),
+        BTreeNode::new(1),
         BTreeNode::build(
-            BTreeNode::new(2, ()),
+            BTreeNode::new(2),
             BTreeNode::build(
-                BTreeNode::new(4, ()),
+                BTreeNode::new(4),
                 None,
-                BTreeNode::new(7, ()),
+                BTreeNode::new(7),
             ),
             None,
         ),
         BTreeNode::build(
-            BTreeNode::new(3, ()),
+            BTreeNode::new(3),
             BTreeNode::build(
-                BTreeNode::new(5, ()),
-                BTreeNode::new(8, ()),
-                BTreeNode::new(9, ()),
+                BTreeNode::new(5),
+                BTreeNode::new(8),
+                BTreeNode::new(9),
             ),
-            BTreeNode::new(6, ()),
+            BTreeNode::new(6),
         ),
     )
     .unwrap();
     assert_eq!(
-        btree.preorder().map(|node| node.key).collect::<Vec<_>>(),
+        btree.preorder().map(|node| node.value).collect::<Vec<_>>(),
         vec![1, 2, 4, 7, 3, 5, 8, 9, 6]
     );
     assert_eq!(
-        btree.inorder().map(|node| node.key).collect::<Vec<_>>(),
+        btree.inorder().map(|node| node.value).collect::<Vec<_>>(),
         vec![4, 7, 2, 1, 8, 5, 9, 3, 6]
     );
     assert_eq!(
-        btree.postorder().map(|node| node.key).collect::<Vec<_>>(),
+        btree.postorder().map(|node| node.value).collect::<Vec<_>>(),
         vec![7, 4, 2, 8, 9, 5, 6, 3, 1]
     );
 }

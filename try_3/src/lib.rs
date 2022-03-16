@@ -54,17 +54,17 @@ impl Solution {
     /// `right` tree node. If map index not found, the `None` matched, then
     /// we just build a empty node.
     #[rustfmt::skip]
-    pub fn get_postorder_traversal<T: Clone + Eq>(
+    pub fn get_postorder_traversal<T: Copy + Eq>(
         preorder: &Vec<T>,
         inorder: &Vec<T>,
     ) -> Vec<T> {
-        fn build<T: Clone + Eq>(
+        fn build<T: Copy + Eq>(
             preorder: &Vec<T>,
             inorder: &Vec<T>,
             left: usize,
             right: usize,
             cnt: &mut usize,
-        ) -> Option<Box<BTreeNode<T, ()>>> {
+        ) -> Option<Box<BTreeNode<T>>> {
             if let Some(idx) = inorder[left..right]
                 .iter()
                 .zip(left..right)
@@ -74,7 +74,7 @@ impl Solution {
             {
                 *cnt += 1;
                 BTreeNode::build(
-                    BTreeNode::new(inorder[idx].clone(), ()),
+                    BTreeNode::new(inorder[idx]),
                     build(preorder, inorder, left, idx, cnt),
                     build(preorder, inorder, idx + 1, right, cnt),
                 )
@@ -85,7 +85,7 @@ impl Solution {
         match build(preorder, inorder, 0, preorder.len(), &mut 0) {
             Some(btree) => btree
                 .postorder()
-                .map(|node| node.key.clone())
+                .map(|node| node.value)
                 .collect(),
             None => Vec::new(),
         }
