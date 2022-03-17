@@ -92,35 +92,30 @@ impl Solution {
 
     /// Question 3 - hdu 4585 "Shaolin"
     ///
-    /// This problem can be simply solved by `Binary Search Tree`.
-    /// On this moment, I'm  lazy to write a `treap` (WIP). So we
-    /// use `BTreeMap` from Standard Library instead. Firstly, We
-    /// create a `BtreeMap` and insert the Master (Lv 10^9, ID 1).
-    /// Then traversing each monk, we insert his (Lv, ID) and then
-    /// get the closest monk's ID by compare their level.
+    /// This problem can be simply solved by `Binary Search Tree`. Although the
+    /// `treap` has finished, we still use `BTreeMap` from Standard Library on
+    /// this example for a constant. Firstly, We create a `BtreeMap` and insert
+    /// the Master (Lv 10^9, ID 1). And then traversing each monk, we insert his
+    /// (Lv, ID) and then get the closest monk's ID by compare their level.
     pub fn recover_lost_records(monks: &Vec<(usize, usize)>) -> Vec<(usize, usize)> {
         let mut map = BTreeMap::new();
         map.insert(1_000_000_000, 1);
         monks
             .iter()
             .map(|&(id, lv)| {
+                let result = match (map.range(..lv).next_back(), map.range(lv..).next()) {
+                    (Some(prev), Some(next)) => match prev.0 + next.0 < lv << 1 {
+                        false => prev,
+                        true => next,
+                    },
+                    (Some(prev), None) => prev,
+                    (None, Some(next)) => next,
+                    (None, None) => panic!("No any matched old monks for this new monk!"),
+                }
+                .1
+                .to_owned();
                 map.insert(lv, id);
-                let prev = map.range(..lv).next_back();
-                let next = map.range(lv + 1..).next();
-                (
-                    id,
-                    *match prev {
-                        Some(prev) => match next {
-                            Some(next) => match prev.0 + next.0 < lv << 1 {
-                                false => prev,
-                                true => next,
-                            },
-                            None => prev,
-                        },
-                        None => next.unwrap(),
-                    }
-                    .1,
-                )
+                (id, result)
             })
             .collect()
     }
