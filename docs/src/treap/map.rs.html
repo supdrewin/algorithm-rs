@@ -874,9 +874,6 @@
 <span id="869">869</span>
 <span id="870">870</span>
 <span id="871">871</span>
-<span id="872">872</span>
-<span id="873">873</span>
-<span id="874">874</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::node::TreapNode</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Borrow</span>,
@@ -1146,10 +1143,7 @@
         <span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
         <span class="ident">Q</span>: <span class="ident">Ord</span>,
     {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">as_mut</span>()<span class="question-mark">?</span>.<span class="ident">remove</span>(<span class="ident">key</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">value</span>)
-        })
+        <span class="self">self</span>.<span class="ident">remove_entry</span>(<span class="ident">key</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">val</span>)<span class="op">|</span> <span class="ident">val</span>)
     }
 
     <span class="doccomment">/// Removes a key from the map, returning the stored key and value if the key</span>

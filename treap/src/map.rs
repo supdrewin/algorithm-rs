@@ -267,10 +267,7 @@ impl<K, V> TreapMap<K, V> {
         K: Borrow<Q> + Ord,
         Q: Ord,
     {
-        self.root.as_mut()?.remove(key).unwrap_or_else(|_| {
-            let node = mem::replace(&mut self.root, None)?;
-            Some(node.value)
-        })
+        self.remove_entry(key).map(|(_, val)| val)
     }
 
     /// Removes a key from the map, returning the stored key and value if the key

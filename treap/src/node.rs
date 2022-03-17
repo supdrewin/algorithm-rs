@@ -95,53 +95,6 @@ impl<K, V> TreapNode<K, V> {
         }
     }
 
-    pub fn remove<Q: ?Sized>(&mut self, key: &Q) -> Result<Option<V>, ()>
-    where
-        K: Borrow<Q> + Ord,
-        Q: Ord,
-    {
-        match key.cmp(self.key.borrow()) {
-            Ordering::Equal => unsafe {
-                let left = &mut self.left as *mut Option<Box<Self>>;
-                let right = &mut self.right as *mut Option<Box<Self>>;
-                match (&*left, &*right) {
-                    (Some(left), Some(right)) => {
-                        if left.priority < right.priority {
-                            self.left_rotate();
-                            self.left.as_mut().unwrap().remove(key)
-                        } else {
-                            self.right_rotate();
-                            self.right.as_mut().unwrap().remove(key)
-                        }
-                    }
-                    (Some(_), None) => Ok(Some({
-                        let node = mem::replace(&mut self.left, None).unwrap();
-                        mem::replace(self, *node).value
-                    })),
-                    (None, Some(_)) => Ok(Some({
-                        let node = mem::replace(&mut self.right, None).unwrap();
-                        mem::replace(self, *node).value
-                    })),
-                    (None, None) => Err(()),
-                }
-            },
-            Ordering::Greater => Ok(match self.right.as_mut() {
-                Some(node) => node.remove(key).unwrap_or_else(|_| {
-                    let node = mem::replace(&mut self.right, None).unwrap();
-                    Some(node.value)
-                }),
-                None => None,
-            }),
-            Ordering::Less => Ok(match self.left.as_mut() {
-                Some(node) => node.remove(key).unwrap_or_else(|_| {
-                    let node = mem::replace(&mut self.left, None).unwrap();
-                    Some(node.value)
-                }),
-                None => None,
-            }),
-        }
-    }
-
     pub fn remove_entry<Q: ?Sized>(&mut self, key: &Q) -> Result<Option<(K, V)>, ()>
     where
         K: Borrow<Q> + Ord,
