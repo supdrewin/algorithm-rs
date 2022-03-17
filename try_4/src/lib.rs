@@ -20,13 +20,13 @@ impl Solution {
             .iter()
             .map(|&(id, lv)| {
                 let result = match (map.range(..lv).next_back(), map.range(lv..).next()) {
+                    (None, None) => panic!("No any matched old monks for this new monk!"),
+                    (Some(prev), None) => prev,
+                    (None, Some(next)) => next,
                     (Some(prev), Some(next)) => match prev.0 + next.0 < lv << 1 {
                         false => prev,
                         true => next,
                     },
-                    (Some(prev), None) => prev,
-                    (None, Some(next)) => next,
-                    (None, None) => panic!("No any matched old monks for this new monk!"),
                 }
                 .1
                 .to_owned();
