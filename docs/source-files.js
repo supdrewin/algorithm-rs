@@ -1,4 +1,5 @@
 var N = null;var sourcesIndex = {};
+sourcesIndex["home"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["leetcode"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["sort"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["treap"] = {"name":"","files":["lib.rs","map.rs","node.rs","set.rs"]};

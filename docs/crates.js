@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["leetcode","sort","treap","try_1","try_2","try_3"];
+window.ALL_CRATES = ["home","leetcode","sort","treap","try_1","try_2","try_3"];
