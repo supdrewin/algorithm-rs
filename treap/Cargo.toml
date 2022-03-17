@@ -1,0 +1,12 @@
+[package]
+name = "treap"
+version = "0.1.0"
+authors = ["Supdrewin"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/supdrewin/algorithm-rs"
+description = """
+An ordered map/set based on a Treap provides APIs similar to the Rust standard library.
+"""
+keywords = ["treap"]
+categories = ["algorithms"]
+edition = "2021"
