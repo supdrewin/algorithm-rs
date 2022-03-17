@@ -663,10 +663,10 @@ impl<'a, K: Ord, V> RangeMut<'a, K, V> {
                 Some(node) => {
                     match range.start_bound() {
                         Bound::Excluded(start) if (*node).key.borrow().le(start) => {
-                            current = (*node).right.as_mut().and_then(|node| Some(node as *mut _))
+                            current = (*node).right.as_mut().and_then(|node| Some(node as *mut _));
                         }
                         Bound::Included(start) if (*node).key.borrow().lt(start) => {
-                            current = (*node).right.as_mut().and_then(|node| Some(node as *mut _))
+                            current = (*node).right.as_mut().and_then(|node| Some(node as *mut _));
                         }
                         _ => {
                             current = (*node).left.as_mut().and_then(|node| Some(node as *mut _));
