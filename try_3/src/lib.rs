@@ -1,5 +1,4 @@
 pub mod btree;
-pub mod treap;
 
 use btree::BTreeNode;
 use std::collections::BTreeMap;
