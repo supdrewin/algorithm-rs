@@ -79,9 +79,12 @@ impl Solution {
             Ordering::Equal => x1.cmp(x2),
             others => others,
         });
+        #[rustfmt::skip]
         vec.into_iter()
             .enumerate()
-            .for_each(|(idx, (_, cow))| result[cow] = idx.min(result[cow]));
+            .for_each(|(idx, (_, cow))| if idx < result[cow] {
+                    result[cow] = idx;
+            });
         result
     }
 }
