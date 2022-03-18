@@ -44,7 +44,68 @@
 <span id="39">39</span>
 <span id="40">40</span>
 <span id="41">41</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">treap::TreapMap</span>;
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
+<span class="kw">use</span> <span class="ident">treap::TreapMap</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Solution</span>;
 
@@ -80,6 +141,65 @@
                 (<span class="ident">id</span>, <span class="ident">result</span>)
             })
             .<span class="ident">collect</span>()
+    }
+
+    <span class="doccomment">/// Question 2 - Count enemies</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The simplest way to solve this problem is processes each command</span>
+    <span class="doccomment">/// and then executes them.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count_enemies</span>(
+        <span class="ident">case</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+        <span class="ident">commands</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="ident">commands</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">command</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">command</span>.<span class="number">0</span>.<span class="ident">as_str</span>() {
+                <span class="string">&quot;Query&quot;</span> =&gt; <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">case</span>[<span class="ident">command</span>.<span class="number">1</span> <span class="op">-</span> <span class="number">1</span>..<span class="ident">command</span>.<span class="number">2</span>].<span class="ident">iter</span>().<span class="ident">sum</span>()),
+                <span class="string">&quot;Add&quot;</span> =&gt; <span class="ident">case</span>[<span class="ident">command</span>.<span class="number">1</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">command</span>.<span class="number">2</span>,
+                <span class="string">&quot;Sub&quot;</span> =&gt; <span class="ident">case</span>[<span class="ident">command</span>.<span class="number">1</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">-</span><span class="op">=</span> <span class="ident">command</span>.<span class="number">2</span>,
+                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unknown command detected&quot;</span>),
+            });
+        <span class="ident">result</span>
+    }
+
+    <span class="doccomment">/// Question 3 - Cows eat clover</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For `cow1` and `cow2`, the clover range their eat are `(x1, x2)`,</span>
+    <span class="doccomment">/// `(x2, y2)`. If `cow1` stronger then `cow2`, it should satisfy `x1</span>
+    <span class="doccomment">/// &lt;= x2`, `y1 &gt;= y2` and `y1 - x1 &gt; y2 - x2`. This question asks us</span>
+    <span class="doccomment">/// about how many cows stronger then each cow the given. Firstly, we</span>
+    <span class="doccomment">/// process range `(x, y)` with the cows index to `vec`. Then we sort</span>
+    <span class="doccomment">/// `vec` by `x1 &lt; x2 or (x1 == x2 and y2 &lt;= y1)` and then we map them</span>
+    <span class="doccomment">/// with index before sorted -&gt; index after sorted. After that we sort</span>
+    <span class="doccomment">/// `vec` again by `y2 &lt; y1 or (y1 == y2 and x1 &lt;= x2)`. Finally, The</span>
+    <span class="doccomment">/// stronger count of each cow is the minimal index between two sorted</span>
+    <span class="doccomment">/// index of the cow.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cows_eat_clover</span>(<span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec</span> <span class="op">=</span> <span class="ident">range</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">enumerate</span>()
+            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">cow</span>, (<span class="ident">x</span>, <span class="ident">y</span>))<span class="op">|</span> ((<span class="ident">x</span>, <span class="ident">y</span>), <span class="ident">cow</span>))
+            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="ident">vec</span>.<span class="ident">sort_by</span>(<span class="op">|</span>((<span class="ident">x1</span>, <span class="ident">y1</span>), <span class="kw">_</span>), ((<span class="ident">x2</span>, <span class="ident">y2</span>), <span class="kw">_</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">x1</span>.<span class="ident">cmp</span>(<span class="ident">x2</span>) {
+            <span class="ident">Ordering::Equal</span> =&gt; <span class="ident">y2</span>.<span class="ident">cmp</span>(<span class="ident">y1</span>),
+            <span class="ident">others</span> =&gt; <span class="ident">others</span>,
+        });
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">range</span>.<span class="ident">len</span>()];
+        <span class="ident">vec</span>.<span class="ident">iter</span>()
+            .<span class="ident">enumerate</span>()
+            .<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">cow</span>))<span class="op">|</span> <span class="ident">result</span>[<span class="ident">cow</span>] <span class="op">=</span> <span class="ident">idx</span>);
+        <span class="ident">vec</span>.<span class="ident">sort_by</span>(<span class="op">|</span>((<span class="ident">x1</span>, <span class="ident">y1</span>), <span class="kw">_</span>), ((<span class="ident">x2</span>, <span class="ident">y2</span>), <span class="kw">_</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">y2</span>.<span class="ident">cmp</span>(<span class="ident">y1</span>) {
+            <span class="ident">Ordering::Equal</span> =&gt; <span class="ident">x1</span>.<span class="ident">cmp</span>(<span class="ident">x2</span>),
+            <span class="ident">others</span> =&gt; <span class="ident">others</span>,
+        });
+        <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
+        <span class="ident">vec</span>.<span class="ident">into_iter</span>()
+            .<span class="ident">enumerate</span>()
+            .<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">idx</span>, (<span class="kw">_</span>, <span class="ident">cow</span>))<span class="op">|</span> <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&lt;</span> <span class="ident">result</span>[<span class="ident">cow</span>] {
+                    <span class="ident">result</span>[<span class="ident">cow</span>] <span class="op">=</span> <span class="ident">idx</span>;
+            });
+        <span class="ident">result</span>
     }
 }
 
