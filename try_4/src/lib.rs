@@ -39,7 +39,8 @@ impl Solution {
 
     /// Question 2 - Count enemies
     ///
-    ///
+    /// The simplest way to solve this problem is processes each command
+    /// and then executes them.
     pub fn count_enemies(
         case: &mut Vec<usize>,
         commands: &Vec<(String, usize, usize)>,
@@ -56,12 +57,19 @@ impl Solution {
         result
     }
 
-    /// Question 3
+    /// Question 3 - Cows eat clover
     ///
-    /// (x1, x2), (x2, y2)
-    /// x1 <= x2, y1 >= y2
-    /// y1 - x1 > y2 - x2
-    pub fn question_3(range: &Vec<(usize, usize)>) -> Vec<usize> {
+    /// For `cow1` and `cow2`, the clover range their eat are `(x1, x2)`,
+    /// `(x2, y2)`. If `cow1` stronger then `cow2`, it should satisfy `x1
+    /// <= x2`, `y1 >= y2` and `y1 - x1 > y2 - x2`. This question asks us
+    /// about how many cows stronger then each cow the given. Firstly, we
+    /// process range `(x, y)` with the cows index to `vec`. Then we sort
+    /// `vec` by `x1 < x2 or (x1 == x2 and y2 <= y1)` and then we map them
+    /// with index before sorted -> index after sorted. After that we sort
+    /// `vec` again by `y2 < y1 or (y1 == y2 and x1 <= x2)`. Finally, The
+    /// stronger count of each cow is the minimal index between two sorted
+    /// index of the cow.
+    pub fn cows_eat_clover(range: &Vec<(usize, usize)>) -> Vec<usize> {
         let mut vec = range
             .iter()
             .enumerate()

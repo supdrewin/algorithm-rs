@@ -27,9 +27,9 @@ fn count_enemies() {
 }
 
 #[test]
-fn question_3() {
+fn cows_eat_clover() {
     assert_eq!(
-        Solution::question_3(&vec![(1, 2), (0, 3), (3, 4)]),
+        Solution::cows_eat_clover(&vec![(1, 2), (0, 3), (3, 4)]),
         vec![1, 0, 0]
     );
 }
