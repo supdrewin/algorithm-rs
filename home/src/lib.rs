@@ -1,2 +1,3 @@
-#[cfg(test)]
-mod tests;
+//! # Algorithm Rust
+//!
+//! Hello world!
