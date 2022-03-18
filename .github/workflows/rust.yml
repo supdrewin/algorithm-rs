@@ -1,0 +1,15 @@
+on: [push, pull_request]
+name: run-cargo-test
+jobs:
+  test:
+    name: Rust project
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install latest nightly
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        default: true
+    - name: Run cargo test
+      run: cargo test -r
