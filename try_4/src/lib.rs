@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use treap::TreapMap;
 
 pub struct Solution;
@@ -36,7 +37,7 @@ impl Solution {
             .collect()
     }
 
-    /// Question 2
+    /// Question 2 - Count enemies
     ///
     ///
     pub fn count_enemies(
@@ -60,8 +61,28 @@ impl Solution {
     /// (x1, x2), (x2, y2)
     /// x1 <= x2, y1 >= y2
     /// y1 - x1 > y2 - x2
-    pub fn question_3(_input: &Vec<(usize, usize)>) -> Vec<usize> {
-        todo!()
+    pub fn question_3(range: &Vec<(usize, usize)>) -> Vec<usize> {
+        let mut vec = range
+            .iter()
+            .enumerate()
+            .map(|(cow, (x, y))| ((x, y), cow))
+            .collect::<Vec<_>>();
+        vec.sort_by(|((x1, y1), _), ((x2, y2), _)| match x1.cmp(x2) {
+            Ordering::Equal => y2.cmp(y1),
+            others => others,
+        });
+        let mut result = vec![0; range.len()];
+        vec.iter()
+            .enumerate()
+            .for_each(|(idx, &(_, cow))| result[cow] = idx);
+        vec.sort_by(|((x1, y1), _), ((x2, y2), _)| match y2.cmp(y1) {
+            Ordering::Equal => x1.cmp(x2),
+            others => others,
+        });
+        vec.into_iter()
+            .enumerate()
+            .for_each(|(idx, (_, cow))| result[cow] = idx.min(result[cow]));
+        result
     }
 }
 

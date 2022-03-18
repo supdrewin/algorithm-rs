@@ -27,7 +27,6 @@ fn count_enemies() {
 }
 
 #[test]
-#[ignore = "todo"]
 fn question_3() {
     assert_eq!(
         Solution::question_3(&vec![(1, 2), (0, 3), (3, 4)]),
