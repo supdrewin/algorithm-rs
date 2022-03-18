@@ -1,4 +1,9 @@
-use std::{borrow::Borrow, cmp::Ordering, mem};
+use std::{
+    borrow::Borrow,
+    cmp::Ordering,
+    mem,
+    ptr::{self, addr_of},
+};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TreapNode<K, V> {
@@ -22,39 +27,27 @@ impl<K, V> TreapNode<K, V> {
         }))
     }
 
-    pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
+    pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&Self>
     where
         K: Borrow<Q> + Ord,
         Q: Ord,
     {
         match key.cmp(self.key.borrow()) {
-            Ordering::Equal => Some(&self.value),
-            Ordering::Greater => self.right.as_ref().and_then(|node| node.get(key)),
-            Ordering::Less => self.left.as_ref().and_then(|node| node.get(key)),
+            Ordering::Equal => Some(self),
+            Ordering::Greater => self.right.as_ref()?.get(key),
+            Ordering::Less => self.left.as_ref()?.get(key),
         }
     }
 
-    pub fn get_key_value<Q: ?Sized>(&self, key: &Q) -> Option<(&K, &V)>
+    pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut Self>
     where
         K: Borrow<Q> + Ord,
         Q: Ord,
     {
         match key.cmp(self.key.borrow()) {
-            Ordering::Equal => Some((&self.key, &self.value)),
-            Ordering::Greater => self.right.as_ref().and_then(|node| node.get_key_value(key)),
-            Ordering::Less => self.left.as_ref().and_then(|node| node.get_key_value(key)),
-        }
-    }
-
-    pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
-    where
-        K: Borrow<Q> + Ord,
-        Q: Ord,
-    {
-        match key.cmp(self.key.borrow()) {
-            Ordering::Equal => Some(&mut self.value),
-            Ordering::Greater => self.right.as_mut().and_then(|node| node.get_mut(key)),
-            Ordering::Less => self.left.as_mut().and_then(|node| node.get_mut(key)),
+            Ordering::Equal => Some(self),
+            Ordering::Greater => self.right.as_mut()?.get_mut(key),
+            Ordering::Less => self.left.as_mut()?.get_mut(key),
         }
     }
 
@@ -95,7 +88,7 @@ impl<K, V> TreapNode<K, V> {
         }
     }
 
-    pub fn remove_entry<Q: ?Sized>(&mut self, key: &Q) -> Result<Option<(K, V)>, ()>
+    pub fn remove<Q: ?Sized>(&mut self, key: &Q) -> Result<Option<Self>, ()>
     where
         K: Borrow<Q> + Ord,
         Q: Ord,
@@ -108,36 +101,34 @@ impl<K, V> TreapNode<K, V> {
                     (Some(left), Some(right)) => {
                         if left.priority < right.priority {
                             self.left_rotate();
-                            self.left.as_mut().unwrap().remove_entry(key)
+                            self.left.as_mut().unwrap().remove(key)
                         } else {
                             self.right_rotate();
-                            self.right.as_mut().unwrap().remove_entry(key)
+                            self.right.as_mut().unwrap().remove(key)
                         }
                     }
                     (Some(_), None) => Ok(Some({
-                        let node = mem::replace(&mut self.left, None).unwrap();
-                        let node = mem::replace(self, *node);
-                        (node.key, node.value)
+                        let node = *mem::replace(&mut self.left, None).unwrap();
+                        mem::replace(self, node)
                     })),
                     (None, Some(_)) => Ok(Some({
-                        let node = mem::replace(&mut self.right, None).unwrap();
-                        let node = mem::replace(self, *node);
-                        (node.key, node.value)
+                        let node = *mem::replace(&mut self.right, None).unwrap();
+                        mem::replace(self, node)
                     })),
                     (None, None) => Err(()),
                 }
             },
             Ordering::Greater => Ok(match self.right.as_mut() {
-                Some(node) => node.remove_entry(key).unwrap_or_else(|_| {
-                    let node = mem::replace(&mut self.right, None).unwrap();
-                    Some((node.key, node.value))
+                Some(node) => node.remove(key).unwrap_or_else(|_| {
+                    let node = *mem::replace(&mut self.right, None).unwrap();
+                    Some(node)
                 }),
                 None => None,
             }),
             Ordering::Less => Ok(match self.left.as_mut() {
-                Some(node) => node.remove_entry(key).unwrap_or_else(|_| {
-                    let node = mem::replace(&mut self.left, None).unwrap();
-                    Some((node.key, node.value))
+                Some(node) => node.remove(key).unwrap_or_else(|_| {
+                    let node = *mem::replace(&mut self.left, None).unwrap();
+                    Some(node)
                 }),
                 None => None,
             }),
@@ -177,9 +168,12 @@ impl<K, V> TreapNode<K, V> {
     }
 }
 
-#[rustfmt::skip]
-fn random<T: Copy>() -> T {
-    fn ptr<T>(r: &T) -> *const T { r }
-    extern "C" { fn rand() -> usize; }
-    unsafe { *ptr(&rand()).cast() }
+fn random<T>() -> T {
+    extern "C" {
+        fn rand() -> usize;
+    }
+    unsafe {
+        let result = rand();
+        ptr::read(addr_of!(result).cast())
+    }
 }

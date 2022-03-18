@@ -130,7 +130,7 @@ impl<K, V> TreapMap<K, V> {
         K: Borrow<Q> + Ord,
         Q: Ord,
     {
-        self.root.as_ref()?.get(key)
+        Some(&self.root.as_ref()?.get(key)?.value)
     }
 
     /// Returns the key-value pair corresponding to the supplied key.
@@ -153,7 +153,8 @@ impl<K, V> TreapMap<K, V> {
         K: Borrow<Q> + Ord,
         Q: Ord,
     {
-        self.root.as_ref()?.get_key_value(key)
+        let node = self.root.as_ref()?.get(key)?;
+        Some((&node.key, &node.value))
     }
 
     /// Returns `true` if the map contains a value for the specified key.
@@ -205,7 +206,7 @@ impl<K, V> TreapMap<K, V> {
         K: Borrow<Q> + Ord,
         Q: Ord,
     {
-        self.root.as_mut()?.get_mut(key)
+        Some(&mut self.root.as_mut()?.get_mut(key)?.value)
     }
 
     /// Inserts a key-value pair into the map.
@@ -267,7 +268,13 @@ impl<K, V> TreapMap<K, V> {
         K: Borrow<Q> + Ord,
         Q: Ord,
     {
-        self.remove_entry(key).map(|(_, val)| val)
+        Some(
+            match self.root.as_mut()?.remove(key) {
+                Err(()) => *mem::replace(&mut self.root, None)?,
+                Ok(node) => node?,
+            }
+            .value,
+        )
     }
 
     /// Removes a key from the map, returning the stored key and value if the key
@@ -293,10 +300,11 @@ impl<K, V> TreapMap<K, V> {
         K: Borrow<Q> + Ord,
         Q: Ord,
     {
-        self.root.as_mut()?.remove_entry(key).unwrap_or_else(|_| {
-            let node = mem::replace(&mut self.root, None)?;
-            Some((node.key, node.value))
-        })
+        let node = match self.root.as_mut()?.remove(key) {
+            Err(()) => *mem::replace(&mut self.root, None)?,
+            Ok(node) => node?,
+        };
+        Some((node.key, node.value))
     }
 
     /// Constructs a double-ended iterator over a sub-range of

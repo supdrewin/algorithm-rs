@@ -35,6 +35,34 @@ impl Solution {
             })
             .collect()
     }
+
+    /// Question 2
+    ///
+    ///
+    pub fn count_enemies(
+        case: &mut Vec<usize>,
+        commands: &Vec<(String, usize, usize)>,
+    ) -> Vec<usize> {
+        let mut result = Vec::new();
+        commands
+            .iter()
+            .for_each(|command| match command.0.as_str() {
+                "Query" => result.push(case[command.1 - 1..command.2].iter().sum()),
+                "Add" => case[command.1 - 1] += command.2,
+                "Sub" => case[command.1 - 1] -= command.2,
+                _ => panic!("unknown command detected"),
+            });
+        result
+    }
+
+    /// Question 3
+    ///
+    /// (x1, x2), (x2, y2)
+    /// x1 <= x2, y1 >= y2
+    /// y1 - x1 > y2 - x2
+    pub fn question_3(_input: &Vec<(usize, usize)>) -> Vec<usize> {
+        todo!()
+    }
 }
 
 #[cfg(test)]
