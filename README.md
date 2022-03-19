@@ -7,10 +7,5 @@
 To test it:
 
 ``` shell
-$ cargo test -r
+$ cargo test
 ```
-
-NOTE:
-
-Avoiding to test `sort` package in `DEBUG` mode,
-the `quick_sort` will overflow its stack.
