@@ -1,7 +1,9 @@
 [workspace]
 members = [
+	"chips",
 	"home",
 	"leetcode",
+	"red_black",
 	"sort",
 	"treap",
 	"try_1",
