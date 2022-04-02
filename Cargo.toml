@@ -10,6 +10,7 @@ members = [
 	"try_2",
 	"try_3",
 	"try_4",
+	"try_6",
 ]
 resolver = "2"
 
