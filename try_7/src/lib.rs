@@ -5,6 +5,9 @@ use catalan_number::CatalanNumber;
 pub struct Solution;
 
 impl Solution {
+    ///
+    ///
+    ///
     pub fn test1() {
         todo!()
     }
@@ -46,12 +49,18 @@ impl Solution {
         catalan_number.into()
     }
 
+    ///
+    ///
+    ///
     pub fn test3() {
         todo!()
     }
 
-    pub fn test4() {
-        todo!()
+    /// Bash Game Problem
+    ///
+    ///
+    pub fn bash_game(n: usize, m: usize) -> String {
+        if n % (m + 1) == 0 { "second" } else { "first" }.to_string()
     }
 }
 
